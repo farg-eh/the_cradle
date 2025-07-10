@@ -1,0 +1,2 @@
+SW, SH = 640, 360
+FRAMERATE = 144
