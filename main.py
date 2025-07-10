@@ -1,7 +1,7 @@
 import pygame
 import sys
 from src.settings import SW, SH, FRAMERATE
-from src.states.state import State
+from src.states import Menu, Game, Editor
 
 
 class Core:
@@ -12,9 +12,18 @@ class Core:
         self.clock = pygame.time.Clock()
         self.dt = 0 
 
-        self.current_state = State(self, 'menu')
+        self.current_state = Menu(self)
+
     def switch_state(self, new_state):
-        pass
+        match new_state:
+            case 'menu':
+                self.current_state = Menu(self)
+            case 'game':
+                self.current_state = Game(self)
+            case 'editor':
+                self.current_state = Editor(self)
+            case _:
+                raise ValueError(f"you tried to switch to an unknow game state : {new_state}")
 
     def run(self):
         while True:
@@ -36,5 +45,6 @@ class Core:
             # draw
             self.current_state.draw()
             pygame.display.update()
+
 if __name__ == '__main__':
     Core().run()
