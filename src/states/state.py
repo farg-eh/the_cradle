@@ -7,6 +7,7 @@ class State(ABC):  # defining State as abstract class
         self.core = core
         self.switch_state = core.switch_state
         self.screen = core.screen
+        self.display = core.display
 
     @abstractmethod
     def handle_input(self, event):

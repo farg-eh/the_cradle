@@ -8,9 +8,10 @@ class Core:
     def __init__(self):
         # basic pygame setup
         pygame.init()
-        self.screen = pygame.display.set_mode((SW, SH))
+        self.screen = pygame.display.set_mode((SW, SH), pygame.SCALED)
         self.clock = pygame.time.Clock()
         self.dt = 0 
+        self.display = pygame.Surface((SW//2, SH//2))
 
         self.current_state = Menu(self)
 
