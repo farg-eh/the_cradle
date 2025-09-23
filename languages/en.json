@@ -1,0 +1,49 @@
+{
+    "book": {
+	"play": {
+	    "hint": "play",
+	    "title": "Play",
+	    "pages": [
+		    "test this is page 1 ",
+		    "test this is page 2 ",
+		    "test this is page 3 ",
+		    "test this is page 4"
+	    ]
+
+	},
+	"editor": {
+		"hint": "edit",
+		"title": "Editor",
+		"pages": [
+			"test this is page 1 ",
+			"test this is page 2 ",
+	                "test this is page 3 "
+		]
+	},
+	"multiplayer": {
+		"hint": "not available yet",
+		"title": "Multiplayer",
+		"pages": []
+	},
+	"settings": {
+		"hint": "settings",
+		"title": "Settings",
+		"pages": [
+			"settings page 1",
+			"settings page 2"
+		]
+	},
+	"about": {
+		"hint": "about",
+		"title": "About",
+		"pages": [
+		    "test this is page 1 ",
+		    "test this is page 2 ",
+		    "test this is page 3 ",
+		    "test page 4",
+		    "test page 5",
+		    "test page 6"
+		]
+	}
+    }
+}

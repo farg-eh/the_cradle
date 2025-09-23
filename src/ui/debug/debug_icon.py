@@ -1,0 +1,2 @@
+class DebugIcon:
+    pass

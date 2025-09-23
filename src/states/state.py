@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-
+from src.mouse_manager import MouseManager
+from src.ui import Group
 
 class State(ABC):  # defining State as abstract class
     def __init__(self, core,  state_name):
@@ -8,14 +9,16 @@ class State(ABC):  # defining State as abstract class
         self.switch_state = core.switch_state
         self.screen = core.screen
         self.display = core.display
+        self.mouse = MouseManager()
+        self.root = Group(pos=(0, 0), size=self.screen.get_size())
 
     @abstractmethod
     def handle_input(self, event):
-        pass
+        self.mouse.get_events(event) # dont forget
 
     @abstractmethod
     def update(self, dt):
-        pass
+        self.mouse.update() # dont forget this should be at the end
 
     @abstractmethod
     def draw(self):

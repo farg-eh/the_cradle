@@ -1,6 +1,7 @@
 import os
 import pygame
-
+import json
+from src.settings import SCALE, LANG
 def get_abs_path(rel_path: str) -> str:
     """
     returns the absolute path of an input path
@@ -11,9 +12,12 @@ def get_abs_path(rel_path: str) -> str:
     Returns:
         str: the absolute path 
     """
-    p = os.path.abspath(os.path.dirname(__file__))
+    p = os.path.abspath(os.path.dirname(__file__))  # check this section if u change the location of utils.py
     rel_path_list = rel_path.split("/")
     return os.path.abspath(os.path.join(p, "..", *rel_path_list))
+
+def import_font(path, size):
+    return pygame.font.Font(get_abs_path(path), size=size)
 
 def import_img(path):
     img = pygame.image.load(get_abs_path(path)).convert()
@@ -27,6 +31,32 @@ def import_imgs(path):
         images.append(import_img(path + '/' + img_name))
     return images
 
+def import_txt_from_json(keys=""):
+    path = get_abs_path(f"languages/{LANG}.json")
+    with open(path, "r") as f:
+        txt = json.load(f)
+    if not keys:
+        return txt
+    else:
+        keys = keys.split(".")
+        for key in keys:
+            if key.isdecimal():
+                key = int(key)
+            txt = txt[key]
+        return txt
+
+class TextLoader:
+    def __init__(self, key_path=''):
+        self.text = import_txt_from_json(keys=key_path)
+
+    def get(self, keys):
+        txt = self.text
+        for key in keys.split("."):
+            if key.isdecimal():
+                key = int(key)
+            txt = txt[key]
+        return txt
+            
 class Animation:
     def __init__(self, dir_path, duration=1000, loop=False):
         self.imgs = import_imgs(dir_path)
@@ -36,14 +66,15 @@ class Animation:
         self.curr_index = 0
         self.timer = Timer(duration=self.duration, 
                                  loop=self.loop)
+    def play(self):
+        self.timer.activate()
 
     def curr_img(self):
         return self.imgs[self.curr_index]
 
     def update(self):
         self.timer.update()
-        if self.timer.get_progress() == 1 and not self.loop:
-            self.done = True
+        self.done = self.timer.done
         self.curr_index = round(self.timer.get_progress() * float(len(self.imgs) - 1))
 
 
@@ -98,8 +129,29 @@ class Timer:
                 if self.func and self.start_time != 0:
                     self.func()
                 self.deactivate()
-            print(self.get_progress())
 
     def __bool__(self):
         return self.active
 
+def get_abs_pos(rect, rel_pos):
+    return rect.left + rel_pos[0], rect.top + rel_pos[1]
+def get_rel_pos(rect, abs_pos):
+    return abs_pos[0] - rect.left, abs_pos[1] - rect.top
+class Pos(pygame.Vector2):
+    def __init__(self, x, y):
+        super().__init__(x, y)
+
+    def display2screen(self):
+        return Pos(self.x * SCALE, self.y * SCALE)
+
+    def screen2display(self):
+        return Pos(self.x / SCALE, self.y / SCALE)
+
+
+class Rect(pygame.Rect):
+    def __init__(self, x, y, width, height):
+        super().__init__(x, y , width, height)
+
+
+    def display2screen(self):
+        return Rect(self.x * SCALE, self.y * SCALE, self.width * SCALE, self.height * SCALE)
