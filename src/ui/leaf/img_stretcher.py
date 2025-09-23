@@ -143,6 +143,8 @@ class Stretchable:
         self.rect = self.stretch_rect.union(self.moving_rect)
 
     # maybe i shoud make the amount connected to the class instead of inputed
+    def get_curr_stretch(self):
+        return self._stretch_x, self._stretch_y
     def set_stretch_x(self, amount):
         # first we stretch the surface 
         self.stretch_surf = pygame.transform.scale(self.original_stretch_surf, 

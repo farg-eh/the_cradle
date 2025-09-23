@@ -6,6 +6,8 @@ from src.states import Menu, Game, Editor, TestYard
 import gc
 from src.ui.custom import gen_debug_panel
 from src.ui import ScrollablePanel
+from src.utils.lerp import oscilating_lerp
+from src.settings import conf
 
 # this class share global info between all other game states and is responsible
 # for state swtiching 
@@ -14,22 +16,31 @@ class Core:
         # start pygame 
         pygame.init()
 
+    
         # load fonts (this can be moved to different states if i try having different fonts for diffrent states)
-        FONTS['small'] = import_font('assets/fonts/regular.ttf', 10)
-        FONTS['mid'] = import_font('assets/fonts/regular.ttf', 14)
-        FONTS['big'] = import_font('assets/fonts/regular.ttf', 18)
+        self.load_fonts()
 
         # display settings
         self.screen = None
         self._fullscreen = False
         self._scaled = True
+        self._show_fps = False
         self.update_screen()
         self.display = pygame.Surface((SW//2, SH//2))
+        # swich state effect
+        self.effect_surface = pygame.Surface((SW, SH), flags=pygame.SRCALPHA)
+        self.effect_surface.fill((1, 1, 1))
+        self.effect_timer = Timer(1000)
+
+        self.effect_timer_func = None
+        # sound settings
+        self._sfx_vol = 1.0
+        self._music_vol = 0.33333
         # framerate & delta time
         self.clock = pygame.time.Clock()
         self.dt = 0 
 
-        self.current_state = TestYard(self)
+        self.current_state = Menu(self)
 
         self.PERFORMANCE_INFO = {'ram_usage': '0 MB',
                                  'fps': '0',
@@ -55,6 +66,27 @@ class Core:
         # modifier keys
         self.K_CTRL = False
 
+    def load_fonts(self):
+        path = 'assets/fonts/regular.ttf'
+        FONTS['small-en'] = import_font(path, 10)
+        FONTS['mid-en'] = import_font(path, 14)
+        FONTS['big-en'] = import_font(path, 17)
+        FONTS['xbig-en'] = import_font(path, 20)
+        FONTS['xxbig-en'] = import_font(path, 24)
+        FONTS['small-ar'] = import_font(path, 10)
+        FONTS['mid-ar'] = import_font(path, 14)
+        FONTS['big-ar'] = import_font(path, 17)
+        FONTS['xbig-ar'] = import_font(path, 20)
+        FONTS['xxbig-ar'] = import_font(path, 24)
+        for f in ['small-ar', 'mid-ar', 'big-ar', 'xbig-ar', 'xxbig-ar']:
+            font = FONTS[f]
+            font.set_script("Arab")
+            font.set_direction(pygame.DIRECTION_RTL)
+            #font.align = pygame.FONT_RIGHT
+
+
+
+
     def prepare_debug_panel(self, debug_panel):
         fullscreen_cbox = debug_panel.get_child_by_name('fullscreen')
         fullscreen_cbox.value = self._fullscreen
@@ -70,6 +102,10 @@ class Core:
         self.debug_panel.set_opacity(panel_opacity_slider.value)
         panel_opacity_slider.func = self.change_dpanel_opacity
 
+
+        self.debug_panel.hidden = not DEBUG
+        print(pygame.display.list_modes(flags=pygame.FULLSCREEN))
+
     def update_screen(self):
         if self._fullscreen and self._scaled:
             self.screen = pygame.display.set_mode((SW, SH), flags=pygame.FULLSCREEN|pygame.SCALED)
@@ -80,7 +116,8 @@ class Core:
         else:
             self.screen = pygame.display.set_mode((SW, SH))
 
-    def switch_state(self, new_state):
+    def _switch_state(self, new_state):
+        pygame.mixer.music.unload()
         match new_state:
             case 'menu':
                 self.current_state = Menu(self)
@@ -93,6 +130,10 @@ class Core:
             case _:
                 raise ValueError(f"you tried to switch to an unknow game state : {new_state}")
 
+    def switch_state(self, new_state):
+        self.effect_timer_func = lambda: self._switch_state(new_state)
+        self.effect_timer.activate()
+
     def run(self):
         while True:
             for event in pygame.event.get():
@@ -102,24 +143,25 @@ class Core:
                     sys.exit()
 
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_F11:
+                    if event.key == pygame.K_F11: # fullscreen switch
                         self._fullscreen = not self._fullscreen 
                         self.update_screen()
 
-                    if event.key == pygame.K_F12:
+                    if event.key == pygame.K_F12: # scaled window switch
                         self._scaled = not self._scaled
                         self.update_screen()
 
-                    if event.key == pygame.K_LCTRL or event.key == pygame.K_RCTRL:
+                    if event.key == pygame.K_LCTRL or event.key == pygame.K_RCTRL: # ctrl buttons tracking
                         self.K_CTRL = True
 
-                    if event.key == pygame.K_d and self.K_CTRL:
+                    if event.key == pygame.K_d and self.K_CTRL: # debug mode 
                         global DEBUG
                         DEBUG = not DEBUG
                         self.debug_panel.hidden = not DEBUG
 
-                    if event.key == pygame.K_0:
+                    if event.key == pygame.K_0: # force grabage collection
                         gc.collect()
+
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_LCTRL or event.key == pygame.K_RCTRL:
                         self.K_CTRL = False
@@ -133,11 +175,23 @@ class Core:
             # update
             self.debug_panel.update(self.dt, self.current_state.mouse)
             self.current_state.update(self.dt)
+            self.effect_timer.update()
+            if self.effect_timer.get_progress() > 0.5 and self.effect_timer_func != None:
+                self.effect_timer_func()
+                self.effect_timer_func = None
+
 
             
             # draw
             self.current_state.draw()
             self.debug_panel.draw(self.screen)
+            if self.effect_timer:
+                self.effect_surface.set_alpha(int(oscilating_lerp(0, 255, 1 - self.effect_timer.get_progress())))
+                self.screen.blit(self.effect_surface)
+
+            if self._show_fps:
+                self.screen.blit(FONTS['mid-en'].render(self.PERFORMANCE_INFO['fps_avg'], False, 'lightyellow'), (SW - 30, 10))
+
             pygame.display.update()
 
             # ~~~~~ calculate game performance info ~~~~~ 
@@ -165,6 +219,7 @@ class Core:
                 #print("\033[95m" + "~"*22 + "\033[0m")
                 #for key, item in self.PERFORMANCE_INFO.items():
                     #print(f"{key} -> \033[93m{item}\033[0m")
+
 
 
             # ~~~~~ update debug panel info ~~~~~ 

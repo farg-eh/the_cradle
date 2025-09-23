@@ -17,6 +17,10 @@ class Slider(UiElement):
         pygame.draw.rect(surf, 'white', self.rect, 3, 3)
         pygame.draw.circle(surf, '#00000000', (self.rect.left + self.rect.width * self.value, self.rect.centery), 4)
 
+    def on_click(self, mouse=None):
+        super().on_click(mouse)
+        print('clicked')
+
     def on_hover(self, mouse=None):
         if not mouse: return
         if self.mouse_inside and mouse.l_down:

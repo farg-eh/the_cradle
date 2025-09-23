@@ -1,6 +1,9 @@
 import pygame
 from src.utils import import_font
-from src.settings import LANG
+from src.settings import conf
+LANG = conf['LANG']
+
+# NOTE: THIS CLASS GOT REPLACED WITH Text in text.py this will be kept here just for refrence just for refrence 
 class TextBox:
     def __init__(self, rect, text='', color="#9D775E", size=10,
                  lang=LANG, scroll=False, padding=10,
@@ -16,7 +19,7 @@ class TextBox:
         self.scroll = scroll
         self.padding = padding
 
-        self.font = import_font("assets/fonts/PixelAE-Regular.ttf", size)
+        self.font = import_font("assets/fonts/regular.ttf", size)
         if lang == "ar":
             self.font.set_script("Arab")
             self.font.set_direction(pygame.DIRECTION_RTL)

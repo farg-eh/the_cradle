@@ -34,6 +34,7 @@ class Panel(Group):
         self.move_to((-self._margin[0]+_mouse_offset[0], -self._margin[1]+_mouse_offset[1]))
         # apply mouse handling logic
         returned = super().handle_mouse(mouse)
+
         # reset mouse pos & rect pos
         mouse.pos = mouse_org_pos
         self.move_to(org_rect_pos)

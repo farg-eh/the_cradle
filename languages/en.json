@@ -1,13 +1,33 @@
 {
+	"menu": {
+	"press_anything_to_start": "press any button to start"
+	
+	},
     "book": {
 	"play": {
 	    "hint": "play",
 	    "title": "Play",
 	    "pages": [
-		    "test this is page 1 ",
-		    "test this is page 2 ",
-		    "test this is page 3 ",
-		    "test this is page 4"
+			[
+			">miml<(page_type='left')",
+		  		">vlist<(show_border=False, padding=[8;5], v_gap=0)",
+					">title<(font_size='xxbig')Game>/title<",
+					">txt<",
+					"here will be the save file selection and game start button",
+					">/txt<",
+				">/vlist<",
+			">/miml<"
+			],
+			[
+			">miml<(page_type='right')",
+		  		">vlist<(show_border=False, padding=[8;5], v_gap=0)",
+					">title<(font_size='xxbig')Game>/title<",
+					">txt<",
+					"here will be an image and the story description",
+					">/txt<",
+				">/vlist<",
+			">/miml<"
+			]
 	    ]
 
 	},
@@ -15,34 +35,212 @@
 		"hint": "edit",
 		"title": "Editor",
 		"pages": [
-			"test this is page 1 ",
-			"test this is page 2 ",
-	                "test this is page 3 "
+					[
+			">miml<(page_type='left')",
+		  		">vlist<(show_border=False, padding=[8;5], v_gap=0)",
+					">title<(font_size='xxbig')Editor>/title<",
+					">txt<",
+					"here will be the map selection",
+					">/txt<",
+				">/vlist<",
+			">/miml<"
+			],
+			[
+			">miml<(page_type='right')",
+		  		">vlist<(show_border=False, padding=[8;5], v_gap=0)",
+					">title<(font_size='xxbig')Editor>/title<",
+					">txt<",
+					"here will be an image and map description",
+					">/txt<",
+				">/vlist<",
+			">/miml<"
+			]
 		]
 	},
 	"multiplayer": {
 		"hint": "not available yet",
 		"title": "Multiplayer",
-		"pages": []
+		"pages": [
+					[
+			">miml<(page_type='left')",
+		  		">vlist<(show_border=False, padding=[8;5], v_gap=0)",
+					">title<(font_size='xxbig')Multiplayer>/title<",
+					">txt<",
+					"empty for now",
+					">/txt<",
+				">/vlist<",
+			">/miml<"
+			],
+			[
+			">miml<(page_type='right')",
+		  		">vlist<(show_border=False, padding=[8;5], v_gap=0)",
+					">title<(font_size='xxbig')Multiplayer>/title<",
+					">txt<",
+					"empty for now",
+					">/txt<",
+				">/vlist<",
+			">/miml<"
+			]
+		]
 	},
 	"settings": {
 		"hint": "settings",
 		"title": "Settings",
 		"pages": [
-			"settings page 1",
-			"settings page 2"
+			[
+			">miml<(page_type='left')",
+		  		">vlist<(show_border=False, padding=[8;5], v_gap=8)",
+					">title<(font_size='xxbig')Settings>/title<",
+					">txt<",
+					"Sound : ",
+					">/txt<",
+					">slider<(name='music_slider')music>/slider<",
+					">slider<(name='sfx_slider')sfx>/slider<",
+					">txt<Display :>/txt<",
+					">hlist<>txt<(font_size='big')->/txt< >checkbox<(name='fullscreen_cbox')>/checkbox< >txt<(font_size='big') Fullscreen>/txt< >/hlist<",
+					">hlist<>txt<(font_size='big')->/txt< >checkbox<(name='scaled_cbox')>/checkbox< >txt<(font_size='big') Scaled>/txt< >/hlist<",
+					">hlist<>txt<(font_size='big')->/txt< >checkbox<(name='show_fps_cbox')>/checkbox< >txt<(font_size='big') Show Fps>/txt< >/hlist<",
+				">/vlist<",
+			">/miml<"
+			],
+			[
+			">miml<(page_type='right')",
+		  		">vlist<(show_border=False, padding=[8;5], v_gap=8)",
+					">title<(font_size='xxbig')Settings>/title<",
+					">txt<",
+					"Language : ",
+					">/txt<",
+					">hlist<(padding=[14;0])",
+					">txt<(font_size='big')[   >/txt< >checkbox<(name='en_cbox')>/checkbox< >txt<(font_size='big') EN   I |>/txt<",
+					">checkbox<(name='ar_cbox')>/checkbox< >txt<(font_size='big') AR>/txt< >txt<(font_size='big')   ] >/txt<",
+					
+					">/hlist<",
+
+				">/vlist<",
+			">/miml<"
+			]
 		]
 	},
 	"about": {
 		"hint": "about",
 		"title": "About",
 		"pages": [
-		    "test this is page 1 ",
-		    "test this is page 2 ",
-		    "test this is page 3 ",
-		    "test page 4",
-		    "test page 5",
-		    "test page 6"
+			[
+			">miml<(page_type='left')",
+		  		">vlist<(show_border=False, padding=[8;5], v_gap=0)",
+					">title<(font_size='xxbig')About>/title<",
+					">txt<The Cradle is a 2D top-down RPG created as my graduation project.",
+					"\n--",
+					"\nIts designed to be a calm experience that mixes farming, mini-games, and light combat with historical-inspired stories and cultural themes.",
+					"it also contains a simple combat system to keep things exciting.",
+					"\n--",
+					"\nThe main idea is to have fun exploring the game and the story reveals.",
+					">/txt<",
+				">/vlist<",
+			">/miml<"
+			],
+			[
+			">miml<(page_type='right')",
+		  		">vlist<(show_border=False, padding=[8;5], v_gap=0)",
+					">title<(font_size='xxbig')About>/title<",		
+					">txt<",
+					"\nThe world is meant to feel as a place you can wander around, build your own little farm, meet characters, and ",
+					"slowly discover things. ",
+					"\n--",
+					"\nThis project is more than just a game to me...",
+					"\n--",
+					"\nits the result of four years of learning, mistakes, growth, and passion.>/txt<",
+
+				">/vlist<",
+			">/miml<"
+			],
+			[
+			">miml<(page_type='left')",
+		  		">vlist<(show_border=False, padding=[8;5], v_gap=0)",				
+		  			">title<(font_size='xxbig') Future Plans >/title<",		
+					">txt<",
+					"After graduation, I want to keep working on The Cradle.",
+					"\ni want to add:-",
+					"\n  ",
+					"\n- more stories [ ]",
+					"\n- more mini-games [ ]",					
+					"\n- more side activites [ ]",
+					"\n- expand the farming content [ ]",
+					"\n- new charcters with deeper lore [ ]",
+					"\n- online co-op experince [ ]",
+					"\n- mobile devices support[ ]",
+					">/txt<",
+				">/vlist<",
+			">/miml<"
+			],
+			[
+			">miml<(page_type='right')",
+		  		">vlist<(show_border=False, padding=[8;5], v_gap=0)",				
+		  			">title<(font_size='xxbig') Dev Word >/title<",		
+					">txt<",
+					"This is the first game I have made with the full intention of finishing it, and it has been one of the most challenging things I have ever done.",
+					"\n--",
+					"\nIm trying to put everything I have learned during my 4 years of studying into this project",
+					"\n--",
+					"\nI want this game to be proof to myself and to everyone who supported me that hard work and patience really do pay off...",
+					">/txt<",
+				">/vlist<",
+			">/miml<"
+			],
+			[
+			">miml<(page_type='left')",
+		  		">vlist<(show_border=False, padding=[8;5], v_gap=0)",				
+		  			">title<(font_size='xxbig') Credit >/title<",		
+					">txt<",
+					"This game exists because of the people who supported and inspired me along the way:",
+					"\n  ",
+					"\n i will fill this section later .. ",
+					"",
+					">/txt<",
+				">/vlist<",
+			">/miml<"
+			],
+			[
+			">miml<(page_type='right')",
+			  	">vlist<(show_border=False, padding=[8;5], v_gap=0)",				
+		  			">title<(font_size='xxbig') Credit >/title<",		
+					">txt<",
+					"This game exists because of the people who supported and inspired me along the way:",
+					"\n  ",
+					"\n i will fill this section later .. ",
+					"",
+					">/txt<",
+				">/vlist<",
+			">/miml<"
+			],
+			[
+			">miml<(page_type='left')",
+		  		">vlist<(show_border=False, padding=[8;5], v_gap=0)",				
+		  			">title<(font_size='xxbig') Special Thanks >/title<",		
+					">txt<",
+					"I also want to give a special thank you to my project supervisor for their guidance, patience, and support throughout this journey.",
+					"\n  ",
+					"\nThank you for believing in my vision, encouraging me to push through challenges, and reminding me that every small step forward matters.",
+					"\n  ",
+					"Im deeply grateful.",
+					">/txt<",
+				">/vlist<",
+			">/miml<"
+			],
+			[
+			">miml<(page_type='right')",
+		  		">vlist<(show_border=False, padding=[8;5], v_gap=0)",
+					">title<(font_size='xxbig')The Journey>/title<",
+					">txt<",
+					"this section should contain a documentation of the development journy",
+					"\n  ",
+					"\ni will fill it later",
+					"\n  ",
+					">/txt<",
+				">/vlist<",
+			">/miml<"
+			]
+		
 		]
 	}
     }

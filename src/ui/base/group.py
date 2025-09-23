@@ -43,7 +43,11 @@ class Group(UiElement):
 
         
     def remove_child(self, ui_element):
-        self.children.remove(ui_element)
+        if ui_element in self.children:
+            self.children.remove(ui_element)
+
+        else:
+            print(f"{ui_element.name} doesnt exist in {self.name} children")
     
     def get_children_by_name(self, name):
         """returns a list of children that have the name if found else returns None"""
@@ -112,8 +116,16 @@ class Group(UiElement):
     def draw(self, surf):
         if self.hidden: return
         super().draw(surf) # will draw the border if show_border enabled
+       # print(f"\033[91m  ~~~~~~~~~~~~~~~~~~~~~~~~~~~ {self.name} have started drawing its children ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \033[0m")
         for child in self.children:
                 child.draw(surf)
+      #          if child.hidden:
+      #              print("child is hidden - {child.name} - ")
+      #              continue
+      #          print(f"\033[91m{self.name}\033[0m have drew \033[92m {child.name} \033[0m")
+
+       # print(f"\033[91m  ~~~~~~~~~~~~~~~~~~~~~~~~~~~ done  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \033[0m")
+        
 
     def update(self, dt, mouse=None):
         if self.hidden: return

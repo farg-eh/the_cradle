@@ -1,17 +1,19 @@
 import pygame
 from src.ui import UiElement
-from src.settings import FONTS
+from src.settings import FONTS, conf
 
 # TODO: padding is broken here it should be fixed by adding a another surface that is separate from the text surface and place the text surface relativly on the new base surface
 class Text(UiElement):
     def __init__(self, text='', color='white', font_size='small', wrap_width=0, pos=(0, 0), name='', parent=None, 
                  clickable=False, hoverable=False, scrollable=False, padding=(0, 0), margin=(0, 0),
-                 show_border=False, hidden=False, border_width=1, border_color='white' ):
+                 show_border=False, hidden=False, border_width=1, border_color='white', lang='en', align='left', colorkey=None):
         # check if fonts are loaded 
         if not FONTS:
-            raise RuntimeError("your trying to create a text element before loading ur fonts in src/settings.py")
+            raise RuntimeError("your trying to create a text element before loading ur fonts from main.py into src/settings.py")
         # setup font 
-        self.font: pygame.font.Font = FONTS[font_size]
+        self.font: pygame.font.Font = FONTS[font_size+"-"+lang]
+        self._align(align)
+
 
         super().__init__( pos=pos, name=name, parent=parent, 
                  clickable=clickable, hoverable=hoverable, scrollable=scrollable, padding=padding, margin=margin,
@@ -23,12 +25,26 @@ class Text(UiElement):
         self.text = text
         self.wrap_width = wrap_width
         self.color = color
+        self.lang = lang
+
 
         # creating surf and updating rects  
         self.surf = self.font.render(text, False, color, wraplength=self.wrap_width)
+        if colorkey:
+            self.surf.set_colorkey(colorkey)
         self._margin = margin
         self._padding = padding
         self._update_element_size()
+
+    def _align(self, alignment='left'):
+        match alignment:
+            case 'left':
+                self.font.align = pygame.FONT_LEFT
+            case 'right': 
+                self.font.align = pygame.FONT_RIGHT
+            case 'mid':
+                self.font.align = pygame.FONT_CENTER
+
 
 
     def _update_element_size(self):

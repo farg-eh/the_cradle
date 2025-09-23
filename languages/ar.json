@@ -1,49 +1,245 @@
 {
-  "book": {
-    "play": {
-      "hint": "ابدأ اللعب",
-      "title": "اللعب",
-      "pages": [
-        "اختبار هذه هي الصفحة ١",
-        "اختبار هذه هي الصفحة ٢",
-        "اختبار هذه هي الصفحة ٣",
-        "اختبار هذه هي الصفحة ٤"
-      ]
-    },
-    "editor": {
-      "hint": "تحرير",
-      "title": "المحرر",
-      "pages": [
-        "اختبار هذه هي الصفحة ١",
-        "اختبار هذه هي الصفحة ٢",
-        "اختبار هذه هي الصفحة ٣"
-      ]
-    },
-    "multiplayer": {
-      "hint": "غير متوفر بعد",
-      "title": "اللعب الجماعي",
-      "pages": []
-    },
-    "settings": {
-      "hint": "الإعدادات",
-      "title": "الإعدادات",
-      "pages": [
-        "صفحة الإعدادات ١",
-        "صفحة الإعدادات ٢"
-      ]
-    },
-    "about": {
-      "hint": "حول",
-      "title": "حول",
-      "pages": [
-        "اختبار هذه هي الصفحة ١",
-        "اختبار هذه هي الصفحة ٢",
-        "اختبار هذه هي الصفحة ٣",
-        "اختبار الصفحة ٤",
-        "اختبار الصفحة ٥",
-        "اختبار الصفحة ٦"
-      ]
-    }
-  }
-}
+	"menu": {
+	"press_anything_to_start": "اضغط اي زر للبدء"
+	},
+	
+    "book": {
+        "play": {
+            "hint": "اللعب",
+            "title": "اللعب",
+            "pages": [
+                [
+                    ">miml<(page_type='left')",
+                    ">vlist<(show_border=False, padding=[8;5], v_gap=0)",
+                        ">title<(font_size='xxbig')اللعبة>/title<",
+                        ">txt<",
+                        "هنا سيكون اختيار ملف الحفظ وزر بدء اللعبة",
+                        ">/txt<",
+                    ">/vlist<",
+                    ">/miml<"
+                ],
+                [
+                    ">miml<(page_type='right')",
+                    ">vlist<(show_border=False, padding=[8;5], v_gap=0)",
+                        ">title<(font_size='xxbig')اللعبة>/title<",
+                        ">txt<",
+                        "هنا ستكون صورة ووصف القصة",
+                        ">/txt<",
+                    ">/vlist<",
+                    ">/miml<"
+                ]
+            ]
+        },
+        "editor": {
+            "hint": "تحرير",
+            "title": "المحرر",
+            "pages": [
+                [
+                    ">miml<(page_type='left')",
+                    ">vlist<(show_border=False, padding=[8;5], v_gap=0)",
+                        ">title<(font_size='xxbig')المحرر>/title<",
+                        ">txt<",
+                        "هنا سيكون اختيار الخريطة",
+                        ">/txt<",
+                    ">/vlist<",
+                    ">/miml<"
+                ],
+                [
+                    ">miml<(page_type='right')",
+                    ">vlist<(show_border=False, padding=[8;5], v_gap=0)",
+                        ">title<(font_size='xxbig')المحرر>/title<",
+                        ">txt<",
+                        "هنا ستكون صورة ووصف الخريطة",
+                        ">/txt<",
+                    ">/vlist<",
+                    ">/miml<"
+                ]
+            ]
+        },
+        "multiplayer": {
+            "hint": "غير متاح حالياً",
+            "title": "تعدد اللاعبين",
+            "pages": [
+                [
+                    ">miml<(page_type='left')",
+                    ">vlist<(show_border=False, padding=[8;5], v_gap=0)",
+                        ">title<(font_size='xxbig')تعدد اللاعبين>/title<",
+                        ">txt<",
+                        "فارغ حالياً",
+                        ">/txt<",
+                    ">/vlist<",
+                    ">/miml<"
+                ],
+                [
+                    ">miml<(page_type='right')",
+                    ">vlist<(show_border=False, padding=[8;5], v_gap=0)",
+                        ">title<(font_size='xxbig')تعدد اللاعبين>/title<",
+                        ">txt<",
+                        "فارغ حالياً",
+                        ">/txt<",
+                    ">/vlist<",
+                    ">/miml<"
+                ]
+            ]
+        },
+        "settings": {
+		"hint": "settings",
+		"title": "Settings",
+		"pages": [
+			[
+			">miml<(page_type='left')",
+		  		">vlist<(show_border=False, padding=[8;5], v_gap=8)",
+					">title<(font_size='xxbig')الاعدادات>/title<",
+					">txt<",
+					"الصوت : ",
+					">/txt<",
+					">slider<(name='music_slider')موسيقى>/slider<",
+					">slider<(name='sfx_slider')اصوات>/slider<",
+					">txt<العرض :>/txt<",
+					">hlist<>txt<(font_size='big', align='left')->/txt< >checkbox<(name='fullscreen_cbox')>/checkbox< >txt<(font_size='big', align='left') ملئ الشاشة>/txt< >/hlist<",
+					">hlist<>txt<(font_size='big', align='left')->/txt< >checkbox<(name='scaled_cbox')>/checkbox< >txt<(font_size='big', align='left') تكبير>/txt< >/hlist<",
+					">hlist<>txt<(font_size='big', align='left')->/txt< >checkbox<(name='show_fps_cbox')>/checkbox< >txt<(font_size='big', align='left') عرض الفريمات>/txt< >/hlist<",
+				">/vlist<",
+			">/miml<"
+			],
+			[
+			">miml<(page_type='right')",
+		  		">vlist<(show_border=False, padding=[8;5], v_gap=8)",
+					">title<(font_size='xxbig')Settings>/title<",
+					">txt<",
+					"اللغة : ",
+					">/txt<",
+					">hlist<(padding=[14;0])",
+					">txt<(font_size='big', lang='en')[   >/txt< >checkbox<(name='en_cbox')>/checkbox< >txt<(font_size='big', lang='en') EN   I |>/txt<",
+					">checkbox<(name='ar_cbox')>/checkbox< >txt<(font_size='big', lang='en') AR>/txt< >txt<(font_size='big', lang='en')   ] >/txt<",
+					
+					">/hlist<",
 
+				">/vlist<",
+			">/miml<"
+			]
+		]
+        },
+        "about": {
+            "hint": "حول",
+            "title": "حول",
+            "pages": [
+                [
+                    ">miml<(page_type='left')",
+                    ">vlist<(show_border=False, padding=[8;5], v_gap=0)",
+                        ">title<(font_size='xxbig')حول>/title<",
+                        ">txt<The Cradle هي لعبة تقمص أدوار ثنائية الأبعاد من الأعلى إلى الأسفل تم إنشاؤها كمشروع تخرجي.",
+                        "\n--",
+                        "\nتم تصميمها لتكون تجربة هادئة تمزج بين الزراعة، والألعاب المصغّرة، والقتال الخفيف مع قصص مستوحاة من التاريخ ومواضيع ثقافية.",
+                        "كما تحتوي أيضًا على نظام قتال بسيط لجعل الأمور أكثر تشويقاً.",
+                        "\n--",
+                        "\nالفكرة الأساسية هي الاستمتاع باستكشاف اللعبة وكشف القصة.",
+                        ">/txt<",
+                    ">/vlist<",
+                    ">/miml<"
+                ],
+                [
+                    ">miml<(page_type='right')",
+                    ">vlist<(show_border=False, padding=[8;5], v_gap=0)",
+                        ">title<(font_size='xxbig')حول>/title<",		
+                        ">txt<",
+                        "\nالعالم مصمم ليشعرك وكأنه مكان يمكنك التجول فيه، وبناء مزرعتك الصغيرة، والتعرف على الشخصيات، ",
+                        "واكتشاف الأشياء تدريجياً.",
+                        "\n--",
+                        "\nهذا المشروع يعني لي أكثر من مجرد لعبة...",
+                        "\n--",
+                        "\nإنه نتيجة لأربع سنوات من التعلم والأخطاء والنمو والشغف.",
+                        ">/txt<",
+                    ">/vlist<",
+                    ">/miml<"
+                ],
+                [
+                    ">miml<(page_type='left')",
+                    ">vlist<(show_border=False, padding=[8;5], v_gap=0)",				
+                        ">title<(font_size='xxbig')خطط مستقبلية>/title<",		
+                        ">txt<",
+                        "بعد التخرج، أريد الاستمرار في العمل على The Cradle.",
+                        "\nأريد إضافة:-",
+                        "\n  ",
+                        "\n- المزيد من القصص [ ]",
+                        "\n- المزيد من الألعاب المصغرة [ ]",					
+                        "\n- المزيد من الأنشطة الجانبية [ ]",
+                        "\n- توسيع محتوى الزراعة [ ]",
+                        "\n- شخصيات جديدة ذات خلفيات أعمق [ ]",
+                        "\n- تجربة تعاونية عبر الإنترنت [ ]",
+                        "\n- دعم أجهزة الهاتف المحمول [ ]",
+                        ">/txt<",
+                    ">/vlist<",
+                    ">/miml<"
+                ],
+                [
+                    ">miml<(page_type='right')",
+                    ">vlist<(show_border=False, padding=[8;5], v_gap=0)",				
+                        ">title<(font_size='xxbig')كلمة المطور>/title<",		
+                        ">txt<",
+                        "هذه أول لعبة أصممها بنيّة إكمالها بالكامل، وكانت من أصعب الأمور التي قمت بها في حياتي.",
+                        "\n--",
+                        "\nأحاول أن أضع كل ما تعلمته خلال سنوات دراستي الأربع في هذا المشروع.",
+                        "\n--",
+                        "\nأريد أن تكون هذه اللعبة دليلاً لي ولجميع من دعموني أن العمل الجاد والصبر يؤتي ثماره فعلاً...",
+                        ">/txt<",
+                    ">/vlist<",
+                    ">/miml<"
+                ],
+                [
+                    ">miml<(page_type='left')",
+                    ">vlist<(show_border=False, padding=[8;5], v_gap=0)",				
+                        ">title<(font_size='xxbig')شكر>/title<",		
+                        ">txt<",
+                        "هذه اللعبة موجودة بفضل الأشخاص الذين دعموني وألهموني طوال الطريق:",
+                        "\n  ",
+                        "\nسأملأ هذه الخانة لاحقاً .. ",
+                        "",
+                        ">/txt<",
+                    ">/vlist<",
+                    ">/miml<"
+                ],
+                [
+                    ">miml<(page_type='right')",
+                    ">vlist<(show_border=False, padding=[8;5], v_gap=0)",				
+                        ">title<(font_size='xxbig')شكر>/title<",		
+                        ">txt<",
+                        "هذه اللعبة موجودة بفضل الأشخاص الذين دعموني وألهموني طوال الطريق:",
+                        "\n  ",
+                        "\nسأملأ هذه الخانة لاحقاً .. ",
+                        "",
+                        ">/txt<",
+                    ">/vlist<",
+                    ">/miml<"
+                ],
+                [
+                    ">miml<(page_type='left')",
+                    ">vlist<(show_border=False, padding=[8;5], v_gap=0)",				
+                        ">title<(font_size='xxbig')شكر خاص>/title<",		
+                        ">txt<",
+                        "أود أيضاً أن أوجه شكر خاص لمشرف مشروعي على توجيهه وصبره ودعمه طوال هذه الرحلة.",
+                        "\n  ",
+                        "\n شكراً على إيمانك برؤيتي، وتشجيعي على تخطي التحديات، وتذكيري أن كل خطوة صغيرة نحو الأمام مهمة .",
+                        "\n  ",
+                        "أنا ممتن جداً.",
+                        ">/txt<",
+                    ">/vlist<",
+                    ">/miml<"
+                ],
+                [
+                    ">miml<(page_type='right')",
+                    ">vlist<(show_border=False, padding=[8;5], v_gap=0)",
+                        ">title<(font_size='xxbig')الرحلة>/title<",
+                        ">txt<",
+                        "يجب أن تحتوي هذه الخانة على توثيق لرحلة التطوير",
+                        "\n  ",
+                        "\nسأملأها لاحقاً",
+                        "\n  ",
+                        ">/txt<",
+                    ">/vlist<",
+                    ">/miml<"
+                ]
+            ]
+        }
+    }
+}

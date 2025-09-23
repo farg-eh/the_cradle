@@ -18,8 +18,9 @@ class State(ABC):  # defining State as abstract class
 
     @abstractmethod
     def update(self, dt):
+        self.root.update(dt, self.mouse) # dont forget updating the root group
         self.mouse.update() # dont forget this should be at the end
 
     @abstractmethod
     def draw(self):
-        pass
+        self.root.draw(self.screen) # dont forget drawing the root group on the screen 

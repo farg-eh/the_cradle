@@ -8,15 +8,16 @@ from src.utils import Pos, get_abs_pos
 # abstract class 
 class List(Panel, ABC):
     def __init__(self, pos=(0, 0), size=(0, 0), name='', parent=None, clickable=False, hoverable=True, scrollable=False,
-                 max_width=0, max_height=0, fixed_size=False, v_gap=3, h_gap=3, show_border=False, hidden=False, border_width=1, border_color='white', padding=(0, 0), margin=(0, 0)) -> None:
+                 max_width=0, max_height=0, fixed_size=False, v_gap=3, h_gap=3, show_border=False, hidden=False, border_width=1, border_color='white', padding=(0, 0), margin=(0, 0),
+                 rtl=False) -> None:
         super().__init__(pos=pos, size=size, name=name, parent=parent, clickable=clickable, hoverable=hoverable, scrollable=scrollable,
                          show_border=show_border, hidden=hidden, border_width=border_width, border_color=border_color, padding=padding, margin=margin)
         # basic properties
         self.max_width = max_width
         self.max_height = max_height
         self.fixed_size = fixed_size
-        self.h_gap = v_gap
-        self.v_gap = h_gap
+        self.h_gap = h_gap
+        self.v_gap = v_gap
 
 
         # stuff used for positioning and wraping
@@ -26,9 +27,12 @@ class List(Panel, ABC):
         self._progress_x = 0
         self._progress_y = 0
 
+        # rtl for hlists TODO: apply for vlist when needed  
+        self.rtl = rtl
+
     def add_child(self, ui_element):
         super().add_child(ui_element)
-        self._update_last_child_pos()
+        self._update_last_child_pos_rtl() if self.rtl else self._update_last_child_pos()
         self._last_child_index += 1
 
     def remove_child(self, ui_element):
@@ -80,8 +84,12 @@ class List(Panel, ABC):
     def _update_last_child_pos(self):
         pass
 
+    def _update_last_child_pos_rtl(self):
+        pass
+
 
 # TODO: do the max_height logic on the hlist
+# NOTE: an idea is to re write the whole hlist logic and make it work as a 2d list to make positioning easier and more flexable i want to achieve flex box flexability in the future 
 class HList(List):
     """this HList or Horizontal List auto positions elements inside it horizontally
     the inital size you specify will expand when needed  
@@ -150,6 +158,71 @@ class HList(List):
         self._fit_kids()
         # exit
         return
+# TODO: merge with the above method to avoid code duplication
+    def _update_last_child_pos_rtl(self):
+        # shorter names to make it easier
+        child = self.children[self._last_child_index]
+        w = child.margin_rect.width
+        h = child.margin_rect.height
+        rect = self.padding_rect
+
+        # the actual positionsing
+        # updating max height (the height of the heighest element in the row)
+        self._max_h = h if h > self._max_h else self._max_h
+
+
+        #if the element is the first in the row then we position it without thinking much 
+        if self._progress_x == 0:
+            child.default_border_color = 'blue' # TODO: this shouldnt exist i think
+            child.move_to(get_abs_pos(rect, (self._progress_x, self._progress_y)))
+            self._progress_x += w 
+            # now we resize if we should
+            self._fit_kids()
+            # and exit 
+            return 
+
+        # now we are not the first element in the row
+        # if we have a width limit (aka max_width is enabled)
+        if self.max_width > 0:
+            if abs(self._progress_x) + self.h_gap + w > self.max_width: # if no room
+                # we go down a row
+                self._progress_x = 0
+                self._progress_y += self._max_h + self.v_gap
+                self._max_h = h
+                # positions the child
+                child.move_to(get_abs_pos(rect, (self._progress_x, self._progress_y)))
+                self._progress_x += w
+                # resize our rects 
+                self._fit_kids()
+                # exit
+                return
+
+        # here is most of the logic
+        # if we have room or if there is no width limit
+        self._progress_x += self.h_gap
+        child.move_to(get_abs_pos(rect, (0, self._progress_y)))
+        self._progress_x += w
+        # resize our rects if we should
+        self._fit_kids()
+        # re position (move) all children having the same y coords as the child 
+        move_amount = abs(w + self.h_gap)
+        for kid in self.children:
+            if kid == child:
+                continue
+            if kid.margin_rect.top == child.margin_rect.top:
+                kid.move_to_by_center((kid.rect.centerx+move_amount , kid.rect.centery))
+
+        # exit
+        return
+
+    def draw(self, surf):
+        super().draw(surf)
+        okay = False
+        if okay:
+            pygame.draw.rect(surf, 'white', self.padding_rect, 1)
+            for child in self.children:
+                pygame.draw.rect(surf, 'red', child.margin_rect.move_to(topleft=get_abs_pos(self.rect, child.pos)), 1)
+
 
 # TODO: do the max_width logic
 class VList(List):
@@ -218,4 +291,15 @@ class VList(List):
         self._fit_kids()
         # exit
         return
+
+    def draw(self, surf):
+        super().draw(surf)
+        if self.show_border:
+            pygame.draw.rect(surf, self.border_color, self.rect, width=1)
+        okay = False
+        if okay:
+            pygame.draw.rect(surf, 'white', self.padding_rect, 1)
+            for child in self.children:
+                pygame.draw.rect(surf, 'red', child.margin_rect.move_to(topleft=get_abs_pos(self.rect, child.pos)), 1)
+
 

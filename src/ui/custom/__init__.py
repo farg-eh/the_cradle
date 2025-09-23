@@ -12,7 +12,7 @@ def gen_debug_panel(parent=None):
     >vlist<(padding=[5;0])
     >h1<Debug Panel>/h1<
     >txt< # Performance INFO:- >/txt<
-    >hlist< >txt<(color='gray') FPS : >/txt< >txt<(name='fps', color='yellow') 0.000 frames >/txt< >/hlist<
+    >hlist< >txt<(color='gray') FPS : >/txt< >txt<(name='fps', color='yellow') 0.00f>/txt< >/hlist<
     >hlist< >txt<(color='gray') System CPU usage : >/txt< >txt<(name='cpu_usage', color='yellow') 0.000 % >/txt< >/hlist<
     >hlist< >txt<(color='gray') RAM usage : >/txt< >txt<(name='ram_usage', color='yellow') 00000 MB >/txt< >/hlist< 
     >hlist< >txt<(color='gray') System remaining RAM : >/txt< >txt<(name='system_available_ram', color='yellow') 00000 MB >/txt< >/hlist< 
@@ -20,7 +20,7 @@ def gen_debug_panel(parent=None):
     >txt< ---------------- >/txt<
     >hlist< >txt< # Settings :- >/txt< >/hlist<
     >hlist< >txt<(color='gray') panel opacity : >/txt< >slider<(name='dpanel_opacity', margin=[0;4])>/slider< >/hlist<
-    >hlist< >txt<(color='gray') fullscreen : >/txt< >checkbox<(name='fullscreen')>/checkbox< >/hlist<
+    >hlist< >txt<(color='gray') fullscreen : >/txt< >checkbox<(name='fullscreen')>/checkbox< >txt<hehe>/txt< >/hlist<
     >hlist< >txt<(color='gray') scaled : >/txt< >checkbox<(name='scaled')>/checkbox< >/hlist<
     >txt< ---------------- >/txt<
     >txt< # UI info >/txt<
