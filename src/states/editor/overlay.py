@@ -10,7 +10,7 @@ class Overlay:
         self.editor = editor
 
         # self.toolbar
-        self.toolbar_buttons = [['pin', 'layers','grid', 'save'], ['zoom', 'bucket', 'pen', 'select', 'move'], ['?','left', 'right', 'settings_1', 'x']]
+        self.toolbar_buttons = [['pin', 'layers','grid', 'save'], ['zoom', 'bucket', 'pen', 'select', 'move'], ['questionmark','left', 'right', 'settings_1', 'x']]
         self.toolbar = HList((265, 0), name= 'toolbar', border_color='gray',bg_color=(12, 12, 12, 48), h_gap=20, border_radius_list=[0, 0, 0, 8], border_width=1)
         for btn_list in self.toolbar_buttons:
             hlist = HList(h_gap=0)

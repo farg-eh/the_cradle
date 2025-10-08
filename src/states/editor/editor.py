@@ -32,6 +32,7 @@ class Editor(State):
         self.clicking = False
         self.right_clicking = False
         self.shift = False
+        self.ctrl = False
         self.ongrid = True
         self.mpos = (0, 0)
 
@@ -108,6 +109,9 @@ class Editor(State):
             if event.key == pygame.K_LSHIFT:
                 self.shift = True
 
+            if event.key == pygame.K_LCTRL:
+                self.ctrl = True
+
             if event.key == pygame.K_DOWN and self.shift:
                 self.camera.cycle_zoom_level_backward()
             if event.key == pygame.K_UP and self.shift:
@@ -115,6 +119,8 @@ class Editor(State):
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LSHIFT:
                 self.shift = False
+            if event.key == pygame.K_LCTRL:
+                self.ctrl = False
 
     def handle_hold_keys(self, dt):
         keys = pygame.key.get_pressed()
@@ -127,8 +133,9 @@ class Editor(State):
         #print(self.camera.focus_pos)
         #print(self.camera._cam_pos)
 
-        self.camera.zoom_value += self.mouse.wheel_dir / 20
-        self.camera.zoom_value = pygame.math.clamp(self.camera.zoom_value, 0.5, 2)
+        if self.shift and self.ctrl:
+            self.camera.zoom_value += self.mouse.wheel_dir / 20
+            self.camera.zoom_value = pygame.math.clamp(self.camera.zoom_value, 0.5, 2)
 
     def _update_size_info(self):
         size_info = self.tilemap.calculate_size()

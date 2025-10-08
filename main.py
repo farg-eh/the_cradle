@@ -42,7 +42,7 @@ class Core:
         self.clock = pygame.time.Clock()
         self.dt = 0 
 
-        self.current_state = Editor(self)
+        self.current_state = Menu(self)
 
         self.PERFORMANCE_INFO = {'ram_usage': '0 MB',
                                  'fps': '0',
