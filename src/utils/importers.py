@@ -59,8 +59,12 @@ def import_sound(rel_path):
 def import_txt_from_json(keys=""):
     # load json first
     path = get_abs_path(f"languages/{conf['LANG']}.json")
-    with open(path, "r") as f:
-        txt = json.load(f)
+    try:
+        with open(path, "r", encoding='utf-8') as f:
+            txt = json.load(f)
+    except UnicodeDecodeError:
+        with open(path, 'r', encoding='cp1252') as f:
+            txt = json.load(f)
     # if no keys return the whole dict
     if not keys:
         return txt
