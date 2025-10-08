@@ -10,10 +10,11 @@ class Panel(Group):
 
     def __init__(self, pos=(0, 0), size=(110, 110), name='', parent=None, 
                  clickable=True, hoverable=True, scrollable=False, padding=(0, 0), margin=(0, 0),
-                 show_border=False, hidden=False, border_width=1, border_color='white', bg_color=(0, 0, 0, 0) ):
+                 show_border=False, hidden=False, border_width=1, border_color='white',border_radius=0, border_radius_list=[0, 0, 0, 0], bg_color=(0, 0, 0, 0) ):
         super().__init__( pos=pos, size=size, name=name, parent=parent, 
                  clickable=clickable, hoverable=hoverable, scrollable=scrollable, padding=padding, margin=margin,
                  show_border=show_border, hidden=hidden, border_width=border_width, border_color=border_color )
+        self.border_radius_list = [border_radius, border_radius, border_radius, border_radius] if border_radius else border_radius_list
 
         self.surf = pygame.Surface((self.rect.width, self.rect.height), pygame.SRCALPHA)
         self.bg_color = pygame.Color(bg_color)
@@ -43,13 +44,20 @@ class Panel(Group):
 
     def draw(self, surf):
         if self.hidden: return
-        if self.show_border:
-            pygame.draw.rect(surf, self.border_color, self.rect, self.border_width)
+        brs = self.border_radius_list
 
-        self.surf.fill(self.bg_color)
+        self.surf.fill((0, 0, 0, 0))
+        pygame.draw.rect(self.surf, self.bg_color, (0, 0, self.rect.width, self.rect.height),
+                             border_top_left_radius=brs[0], border_top_right_radius=brs[1],
+                             border_bottom_right_radius=brs[2], border_bottom_left_radius=brs[3])
 
         for child in self.children:
             child.draw(self.surf)
+
+        if self.show_border:
+            pygame.draw.rect(self.surf, self.border_color, (0, 0, self.rect.width, self.rect.height), self.border_width,
+                             border_top_left_radius=brs[0], border_top_right_radius=brs[1],
+                             border_bottom_right_radius=brs[2], border_bottom_left_radius=brs[3])
 
         surf.blit(self.surf, self.margin_rect)
 
@@ -101,9 +109,12 @@ class ScrollablePanel(Panel):
         self.surf.fill((0, 0, 0, 0))
         self.surf.blit(self.content_surf, -self.offset)
 
+        if self.show_border:
+            pygame.draw.rect(self.surf, self.border_color, (0, 0, self.rect.width, self.rect.height), self.border_width)
+
         surf.blit(self.surf, self.rect)
 
-        UiElement.draw(self, surf)
+        #UiElement.draw(self, surf)
 
 
     

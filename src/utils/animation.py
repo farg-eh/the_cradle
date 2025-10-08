@@ -4,7 +4,7 @@ from . import import_imgs
 
 
 class Animation:
-    def __init__(self, dir_path='', duration=1000, loop=False, imgs=[]):
+    def __init__(self, dir_path='', duration=1000, loop=False, imgs=[], autostart=False):
         if imgs:
             self.imgs = imgs
         else:
@@ -16,6 +16,13 @@ class Animation:
         self.timer = Timer(duration=self.duration, 
                                  loop=self.loop)
         self.name = dir_path.split('/')[-1]
+        self.autostart = autostart
+        if autostart:
+            self.play()
+        
+    def copy(self):
+        return Animation(imgs=self.imgs, duration=self.duration, loop=self.loop, autostart=self.autostart)
+        
     def play(self):
         self.timer.activate()
 

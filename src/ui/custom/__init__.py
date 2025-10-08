@@ -1,6 +1,6 @@
 from src.ui import ScrollablePanel
 from src.ui import mimlize, CLASSES
-
+from .notify import NotificationCard, NotificationManager
 
 
 

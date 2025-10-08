@@ -1,0 +1,95 @@
+import json
+import pygame
+from datetime import datetime
+from src.utils import get_abs_path
+from src.settings import TILE_SIZE
+
+PHYSICS_TILES = {'grass', 'stone'}
+
+
+
+class Tilemap:
+    def __init__(self, game, tile_size=16):
+        self.game = game
+        self.tile_size = tile_size
+        self.tilemap = {}
+        self.offgrid_tiles = []
+        
+    def extract2(self, id_pairs, keep=False):
+        matches = []
+        for tile in self.offgrid_tiles.copy():
+            if (tile['type'], tile['variant']) in id_pairs:
+                matches.append(tile.copy())
+                if not keep:
+                    self.offgrid_tiles.remove(tile)
+                    
+        for loc in self.tilemap:
+            tile = self.tilemap[loc]
+            if (tile['type'], tile['variant']) in id_pairs:
+                matches.append(tile.copy())
+                matches[-1]['pos'] = matches[-1]['pos'].copy()
+                matches[-1]['pos'][0] *= self.tile_size
+                matches[-1]['pos'][1] *= self.tile_size
+                if not keep:
+                    del self.tilemap[loc]
+        
+        return matches
+    
+    def tiles_around(self, pos):
+        NEIGHBOR_OFFSETS = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (0, 0), (-1, 1), (0, 1), (1, 1)]
+        tiles = []
+        tile_loc = (int(pos[0] // self.tile_size), int(pos[1] // self.tile_size))
+        for offset in NEIGHBOR_OFFSETS:
+            check_loc = str(tile_loc[0] + offset[0]) + ';' + str(tile_loc[1] + offset[1])
+            if check_loc in self.tilemap:
+                tiles.append(self.tilemap[check_loc])
+        return tiles
+    
+    def save(self, path):
+        f = open(path, 'w')
+        json.dump({'tilemap': self.tilemap, 'tile_size': self.tile_size, 'offgrid': self.offgrid_tiles}, f)
+        f.close()
+        self.game.core.notifier.notify("map saved as")
+        print('saved')
+        
+    def load(self, path):
+        f = open(path, 'r')
+        map_data = json.load(f)
+        f.close()
+        
+        self.map = map_data['tilemap']
+        self.tilemap = map_data['tilemap']
+        self.tile_size = map_data['tile_size']
+        self.offgrid_tiles = map_data['offgrid']
+    
+    def physics_rects_around(self, pos):
+        rects = []
+        for tile in self.tiles_around(pos):
+            if tile['type'] in PHYSICS_TILES:
+                rects.append(pygame.Rect(tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size, self.tile_size, self.tile_size))
+        return rects
+
+    def render(self, surf, player=None, offset=(0, 0)):
+            
+        for x in range(offset[0] // self.tile_size, (offset[0] + surf.get_width()) // self.tile_size + 1):
+            for y in range(offset[1] // self.tile_size, (offset[1] + surf.get_height()) // self.tile_size + 1):
+                loc = str(x) + ';' + str(y)
+                if loc in self.tilemap:
+                    tile = self.tilemap[loc]
+                    surf.blit(self.game.assets[tile['type']][tile['variant']], (tile['pos'][0] * self.tile_size - offset[0], tile['pos'][1] * self.tile_size - offset[1]))
+
+        y = 0
+        player_rendered = False
+        pt = {'type':"player", "pos": (player.pos[0], player.pos[1] - 20)} if player else {'type':'player', "pos":(0, 0)}
+        for tile in sorted([*self.offgrid_tiles, pt], key=lambda y: y['pos'][1]):
+            y = tile['pos'][1]
+            if tile['type'] == 'player':
+                if player:
+                    player.render(surf, offset)
+                    player_rendered = True
+            else:
+                surf.blit(self.game.assets[tile['type']][tile['variant']], (tile['pos'][0] - offset[0], tile['pos'][1] - offset[1]))
+
+        if not player_rendered and player != None:
+            player.render(surf, offset)
+

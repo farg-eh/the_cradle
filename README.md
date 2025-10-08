@@ -22,6 +22,10 @@ after that install pygame-ce with:
 ```
 pip3 install pygame-ce
 ```
+psutil will be optional in there future but for now install it with
+```
+pip3 install psutil
+```
 clone or downloaded this repo 
 then u can run the game with:
 ```
@@ -35,8 +39,8 @@ python3 main.py
 ## project plan
 ### phase 1 - creating the basic structure of the game
 - [x] create github repo 
-- [ ] ui & main menu creation
-- [ ] develop basic level editor
+- [x] ui & main menu creation
+- [x] develop basic level editor
 - [ ] create a sandbox to test and develop features and mechanics
 ### phase 2 - coming soon
 lets finish phase 1 first!

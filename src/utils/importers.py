@@ -22,10 +22,27 @@ def get_abs_path(rel_path: str) -> str:
 def import_font(path, size):
     return pygame.font.Font(get_abs_path(path), size=size)
 
-def import_img(path):
-    img = pygame.image.load(get_abs_path(path)).convert()
+def import_img(path, scale2x=False):
+    img = pygame.image.load(get_abs_path(path)).convert_alpha()
     img.set_colorkey('black')  # color to be filled with transparency
+    if scale2x:
+        img = pygame.transform.scale2x(img)
     return img
+
+def import_imgs(path, scale2x=False):
+    images = []
+    img_names = sorted(os.listdir(get_abs_path(path)))
+    for img_name in img_names:
+        images.append(import_img(path + '/' + img_name, scale2x))
+    return images
+
+def import_imgs_as_dict(path, scale2x=False):
+    images = {}
+    img_names = sorted(os.listdir(get_abs_path(path)))
+    for img_name in img_names:
+        images[img_name] = import_img(path + '/' + img_name, scale2x)
+    return images
+        
 
 # this should return a sound name sound | list[sound]
 def import_sound(rel_path):
@@ -38,12 +55,6 @@ def import_sound(rel_path):
         return sound_name[0], [pygame.mixer.Sound(get_abs_path(rel_path + '/' + f_name)) for f_name in dir_list]
 
 
-def import_imgs(path):
-    images = []
-    img_names = sorted(os.listdir(get_abs_path(path)))
-    for img_name in img_names:
-        images.append(import_img(path + '/' + img_name))
-    return images
 
 def import_txt_from_json(keys=""):
     # load json first

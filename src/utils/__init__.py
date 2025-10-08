@@ -1,9 +1,9 @@
-from .importers import get_abs_path, import_font, import_img, import_imgs, import_sound, import_txt_from_json, TextLoader
+from .importers import get_abs_path, import_font, import_img, import_imgs, import_sound, import_txt_from_json, TextLoader,import_imgs_as_dict
 from .timer import Timer
 from .animation import Animation
 from .structs import Pos, Rect
 from .sound import SoundManager
-from .lerp import oscilating_lerp
+from .lerp import oscilating_lerp, smooth_step_lerp
 # helper funcs
 def get_abs_pos(rect, rel_pos):
     return rect.left + rel_pos[0], rect.top + rel_pos[1]

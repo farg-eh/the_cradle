@@ -8,10 +8,11 @@ from src.utils import Pos, get_abs_pos
 # abstract class 
 class List(Panel, ABC):
     def __init__(self, pos=(0, 0), size=(0, 0), name='', parent=None, clickable=False, hoverable=True, scrollable=False,
-                 max_width=0, max_height=0, fixed_size=False, v_gap=3, h_gap=3, show_border=False, hidden=False, border_width=1, border_color='white', padding=(0, 0), margin=(0, 0),
+                 max_width=0, max_height=0, fixed_size=False, v_gap=3, h_gap=3, show_border=False, hidden=False, border_width=1, border_color='white', border_radius=0, border_radius_list=[0, 0, 0, 0], bg_color=(0, 0, 0, 0),  padding=(0, 0), margin=(0, 0),
                  rtl=False) -> None:
         super().__init__(pos=pos, size=size, name=name, parent=parent, clickable=clickable, hoverable=hoverable, scrollable=scrollable,
-                         show_border=show_border, hidden=hidden, border_width=border_width, border_color=border_color, padding=padding, margin=margin)
+                         show_border=show_border, hidden=hidden, border_width=border_width, border_color=border_color, padding=padding,
+                         margin=margin, bg_color=bg_color, border_radius=border_radius, border_radius_list=border_radius_list)
         # basic properties
         self.max_width = max_width
         self.max_height = max_height
@@ -62,7 +63,7 @@ class List(Panel, ABC):
         self.padding_rect.center = self.rect.center
 
         # lets resize the surface too 
-        self.surf = pygame.Surface(self.rect.size)
+        self.surf = pygame.Surface(self.rect.size, pygame.SRCALPHA)
         self.surf.set_colorkey('black')
 
     def _reset_positioning_stuff(self):
@@ -127,7 +128,8 @@ class HList(List):
         #if the element is the first in the row then we position it without thinking much 
         if self._progress_x == 0:
             child.default_border_color = 'blue'
-            child.move_to(get_abs_pos(rect, (self._progress_x, self._progress_y)))
+            #child.move_to(get_abs_pos(rect, (self._progress_x, self._progress_y)))
+            child.move_to((self._progress_x, self._progress_y))
             self._progress_x += w 
             # now we resize if we should
             self._fit_kids()
@@ -143,7 +145,8 @@ class HList(List):
                 self._progress_y += self._max_h + self.v_gap
                 self._max_h = h
                 # positions the child
-                child.move_to(get_abs_pos(rect, (self._progress_x, self._progress_y)))
+                #child.move_to(get_abs_pos(rect, (self._progress_x, self._progress_y)))
+                child.move_to((self._progress_x, self._progress_y))
                 self._progress_x += w
                 # resize our rects 
                 self._fit_kids()
@@ -152,7 +155,8 @@ class HList(List):
 
         # if we have room or if there is no width limit
         self._progress_x += self.h_gap
-        child.move_to(get_abs_pos(rect, (self._progress_x, self._progress_y)))
+        #child.move_to(get_abs_pos(rect, (self._progress_x, self._progress_y)))
+        child.move_to((self._progress_x, self._progress_y))
         self._progress_x += w
         # resize our rects if we should
         self._fit_kids()
@@ -217,7 +221,7 @@ class HList(List):
 
     def draw(self, surf):
         super().draw(surf)
-        okay = False
+        okay = False # useful with debugging 
         if okay:
             pygame.draw.rect(surf, 'white', self.padding_rect, 1)
             for child in self.children:

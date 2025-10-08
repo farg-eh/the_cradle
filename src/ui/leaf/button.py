@@ -3,8 +3,8 @@ from src.ui import UiElement
 from . import Text
 
 class Button(UiElement):
-    def __init__(self, pos=(0,0), name='btn', text="btn", fore_color='white', back_color='black'):
-        super().__init__(pos, (34, 16), clickable=True, name=name)
+    def __init__(self, pos=(0,0),size=(34, 16), name='btn', text="btn", fore_color='white', back_color='black'):
+        super().__init__(pos, size, clickable=True, name=name)
         self.hoverable = True
         self._c1 = fore_color
         self._c2 = back_color

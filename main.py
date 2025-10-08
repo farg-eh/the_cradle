@@ -1,6 +1,7 @@
 import pygame
 import sys, os, psutil
 from src.settings import SW, SH, FRAMERATE, DEBUG, FONTS
+from src.ui.custom.notify import NotificationManager
 from src.utils import Timer, import_font
 from src.states import Menu, Game, Editor, TestYard
 import gc
@@ -8,6 +9,7 @@ from src.ui.custom import gen_debug_panel
 from src.ui import ScrollablePanel
 from src.utils.lerp import oscilating_lerp
 from src.settings import conf
+from src.joystick import JoysMgr
 
 # this class share global info between all other game states and is responsible
 # for state swtiching 
@@ -26,7 +28,7 @@ class Core:
         self._scaled = True
         self._show_fps = False
         self.update_screen()
-        self.display = pygame.Surface((SW//2, SH//2))
+        self.display = pygame.Surface((SW//2, SH//2), pygame.SRCALPHA)
         # swich state effect
         self.effect_surface = pygame.Surface((SW, SH), flags=pygame.SRCALPHA)
         self.effect_surface.fill((1, 1, 1))
@@ -40,7 +42,7 @@ class Core:
         self.clock = pygame.time.Clock()
         self.dt = 0 
 
-        self.current_state = Menu(self)
+        self.current_state = Editor(self)
 
         self.PERFORMANCE_INFO = {'ram_usage': '0 MB',
                                  'fps': '0',
@@ -63,8 +65,23 @@ class Core:
         self.debug_panel: ScrollablePanel = gen_debug_panel()
         self.prepare_debug_panel(self.debug_panel)
 
+        # notification card test
+        #self.nc = NotificationCard()
+
         # modifier keys
         self.K_CTRL = False
+
+        # joysticks manager
+        self.joy_mgr = JoysMgr(self)
+
+        # notifications manager
+        self.notifier = NotificationManager()
+        
+
+
+        # delete
+        self.meme_msgs = ["i", "love", "you\n meme sOOOoOOOOooooo much !!!", "<3 "*17, 'love you '*9, "hehe", "hugs", ":)", "mwah"*40 ] 
+        self.ind = 0
 
     def load_fonts(self):
         path = 'assets/fonts/regular.ttf'
@@ -161,12 +178,16 @@ class Core:
 
                     if event.key == pygame.K_0: # force grabage collection
                         gc.collect()
+                        self.notifier.notify(self.meme_msgs[self.ind])
+                        self.ind +=1
+                        self.ind %= len(self.meme_msgs)
 
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_LCTRL or event.key == pygame.K_RCTRL:
                         self.K_CTRL = False
 
                 # ~~~~~ state event handling ~~~~~
+                self.joy_mgr.handle_event(event)
                 self.current_state.handle_input(event)
 
             # calculate delta time
@@ -174,17 +195,30 @@ class Core:
 
             # update
             self.debug_panel.update(self.dt, self.current_state.mouse)
+
             self.current_state.update(self.dt)
+            
             self.effect_timer.update()
             if self.effect_timer.get_progress() > 0.5 and self.effect_timer_func != None:
                 self.effect_timer_func()
                 self.effect_timer_func = None
 
+            self.joy_mgr.update()
+
+            #self.nc.update(self.dt, self.current_state.mouse)
+            self.notifier.update(self.dt, self.current_state.mouse)
+
 
             
             # draw
             self.current_state.draw()
+
             self.debug_panel.draw(self.screen)
+
+            #self.nc.draw(self.screen)
+            self.notifier.draw(self.screen)
+            #print(self.notifier.children)
+
             if self.effect_timer:
                 self.effect_surface.set_alpha(int(oscilating_lerp(0, 255, 1 - self.effect_timer.get_progress())))
                 self.screen.blit(self.effect_surface)
