@@ -47,3 +47,13 @@ class Timer:
 
     def __bool__(self):
         return self.active
+
+
+class StopWatch:
+    def __init__(self):
+        self.start_time = pygame.time.get_ticks()
+        self.active = True
+
+    def get_time(self):
+        return pygame.time.get_ticks() - self.start_time
+        

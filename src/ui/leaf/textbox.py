@@ -24,7 +24,7 @@ class TextBox:
             self.font.set_script("Arab")
             self.font.set_direction(pygame.DIRECTION_RTL)
             self.font.align = pygame.FONT_RIGHT
-        self.text_surf = self.font.render(text, False, color, wraplength=self.rect.width)
+        self.text_surf = self.font.render(text, False, color, wraplength=int(self.rect.width))
 
     def draw(self, surface):
         surface.blit(self.text_surf, self.rect.topleft)

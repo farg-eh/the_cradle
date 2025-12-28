@@ -36,16 +36,17 @@ def import_imgs(path, scale2x=False):
         images.append(import_img(path + '/' + img_name, scale2x))
     return images
 
-def import_imgs_as_dict(path, scale2x=False):
+def import_imgs_as_dict(path, scale2x=False, remove_ext=False):
     images = {}
     img_names = sorted(os.listdir(get_abs_path(path)))
     for img_name in img_names:
-        images[img_name] = import_img(path + '/' + img_name, scale2x)
+        img_n = img_name if not remove_ext else img_name.rsplit('.', maxsplit=2)[0]
+        images[img_n] = import_img(path + '/' + img_name, scale2x)
     return images
         
 
-# this should return a sound name sound | list[sound]
 def import_sound(rel_path):
+    """returns either a (name:str, pygame.Sound) or a (name:str, list[pygame.Sound] depending on the path"""
     file_name = rel_path.split('/')[-1]
     sound_name = file_name.split('.')
     if len(sound_name) > 1:  # its a single file
@@ -59,12 +60,8 @@ def import_sound(rel_path):
 def import_txt_from_json(keys=""):
     # load json first
     path = get_abs_path(f"languages/{conf['LANG']}.json")
-    try:
-        with open(path, "r", encoding='utf-8') as f:
-            txt = json.load(f)
-    except UnicodeDecodeError:
-        with open(path, 'r', encoding='cp1252') as f:
-            txt = json.load(f)
+    with open(path, "r") as f:
+        txt = json.load(f)
     # if no keys return the whole dict
     if not keys:
         return txt

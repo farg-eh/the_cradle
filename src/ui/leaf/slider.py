@@ -34,7 +34,7 @@ class Slider(UiElement):
             self.value = max(min(self.value, self.max_v), self.min_v)  # clamp the value so its never more than max_v or less than min_v
             if self.func:
                 self.func(self.value, mouse)
-            print(f"somthing {self.value}")
+            # print(f"somthing {self.value}")
     #    if self.mouse_inside and mouse.l_up_once and self.being_changed:
     #        print(f'\033[91m something -{self.value}\033[0m')
     #        if self.func:

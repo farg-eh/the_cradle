@@ -4,11 +4,12 @@ from . import import_imgs
 
 
 class Animation:
-    def __init__(self, dir_path='', duration=1000, loop=False, imgs=[], autostart=False):
-        if imgs:
+    def __init__(self, dir_path='', duration=1000, loop=False, imgs=None, autostart=False):
+        if imgs != None:
             self.imgs = imgs
         else:
             self.imgs = import_imgs(dir_path)
+        self.dir_path = dir_path
         self.duration = duration 
         self.loop = loop
         self.done = False
@@ -21,7 +22,16 @@ class Animation:
             self.play()
         
     def copy(self):
-        return Animation(imgs=self.imgs, duration=self.duration, loop=self.loop, autostart=self.autostart)
+        imgs = [img.copy() for img in self.imgs]
+        return Animation(dir_path=self.dir_path, imgs=imgs, duration=self.duration, loop=self.loop, autostart=self.autostart)
+
+    def change_color_copy(self, old_color, new_color):
+        animation = self.copy()
+        for frame in animation.imgs:
+            pxl_array = pygame.PixelArray(frame)
+            pxl_array.replace(old_color, new_color)
+            del pxl_array
+        return animation
         
     def play(self):
         self.timer.activate()
@@ -43,4 +53,7 @@ class Animation:
 
     def __setitem__(self,index, item):
         self.imgs[index] = item
+
+    def __len__(self):
+        return len(self.imgs)
 

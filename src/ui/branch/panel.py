@@ -2,6 +2,7 @@ import pygame
 from src import ui
 from src.ui import Group, UiElement
 from src.utils import get_rel_pos, Rect, Pos
+from src.utils.lerp import smooth_step_lerp
 
 class Panel(Group):
     """this branch element doesnt order its children in any specifc way they are positioned using their positions
@@ -10,7 +11,7 @@ class Panel(Group):
 
     def __init__(self, pos=(0, 0), size=(110, 110), name='', parent=None, 
                  clickable=True, hoverable=True, scrollable=False, padding=(0, 0), margin=(0, 0),
-                 show_border=False, hidden=False, border_width=1, border_color='white',border_radius=0, border_radius_list=[0, 0, 0, 0], bg_color=(0, 0, 0, 0) ):
+                 show_border=False, hidden=False, border_width=1, border_color='white',border_radius=0, border_radius_list=[0, 0, 0, 0], bg_color=(0, 0, 0, 0)):
         super().__init__( pos=pos, size=size, name=name, parent=parent, 
                  clickable=clickable, hoverable=hoverable, scrollable=scrollable, padding=padding, margin=margin,
                  show_border=show_border, hidden=hidden, border_width=border_width, border_color=border_color )
@@ -42,6 +43,7 @@ class Panel(Group):
         
         return returned
 
+    # TODO: start using dirty flags to optmize perfromance 
     def draw(self, surf):
         if self.hidden: return
         brs = self.border_radius_list
@@ -65,28 +67,48 @@ class ScrollablePanel(Panel):
     """like Panel but allows scrolling"""
     def __init__(self, pos=(0, 0), size=(110, 110), name='', parent=None, 
                  clickable=True, hoverable=True, scrollable=False, padding=(0, 0), margin=(0, 0),
-                 show_border=False, hidden=False, border_width=1, border_color='white', bg_color=(0, 0, 0, 0)):
+                 show_border=False, hidden=False, border_width=1, border_color='white', bg_color=(0, 0, 0, 0), border_radius=0):
         super().__init__( pos=pos, size=size, name=name, parent=parent, 
                  clickable=clickable, hoverable=hoverable, scrollable=True, padding=padding, margin=margin,
-                 show_border=show_border, hidden=hidden, border_width=border_width, border_color=border_color, bg_color=bg_color )
+                 show_border=show_border, hidden=hidden, border_width=border_width, border_color=border_color, bg_color=bg_color, border_radius=border_radius )
 
         self.content_rect = Rect(0, 0, 0, 0)  
         self.content_surf = pygame.Surface((0, 0), pygame.SRCALPHA)
         self.offset = Pos(0, 0)
-        self.scroll_speed = 4
+        self.lerp_offset = Pos(0, 0)
+        self.scroll_speed = 25
+
+    def _lerp_scroll(self, dt):
+        # TODO: this is dum optimize it please
+        if self.lerp_offset.x == self.offset.x and self.lerp_offset.y == self.offset.y: return
+
+        dist = self.lerp_offset.distance_to(self.offset)
+        if dist < 1:
+            self.lerp_offset.x, self.lerp_offset.y = self.offset.x, self.offset.y
+            return
+        # now we will use a smooth step function to map distance to speed
+        max_speed = 350
+        min_speed = 25
+        #k = 0.8
+        max_dist = 55 
+        t = pygame.math.clamp( dist/max_dist, 0, 1)
+        move_amount = smooth_step_lerp(min_speed, max_speed, t)
+        self.lerp_offset.move_towards_ip(self.offset, move_amount*dt)
 
     def on_scroll(self, mouse):
         super().on_scroll(mouse)
-        print(f"mouse wheel_dir = {mouse.wheel_dir}\noffsety: {self.offset.y}, crect width: {self.content_rect.height}")
+        # print(f"mouse wheel_dir = {mouse.wheel_dir}\noffsety: {self.offset.y}, crect width: {self.content_rect.height}")
         self.offset.y += mouse.wheel_dir * self.scroll_speed
-        if self.offset.y > self.content_surf.height - self.surf.height:
-            self.offset.y = self.content_surf.height - self.surf.height
+        # FIXME please optmize T - T stop making hacks this solves 
+        self.calc_content_surf()
+        if self.offset.y > self.content_surf.height - self.surf.height + self._padding[1] + 4:  # FIXME please remove the 4
+           self.offset.y = self.content_surf.height - self.surf.height + self._padding[1] + 4
         elif self.offset.y < 0:
-            self.offset.y = 0
+           self.offset.y = 0
 
     def calc_content_rect(self):
         rect = self.rect.copy()
-        self.content_rect = rect.unionall([x.margin_rect for x in self.children])
+        self.content_rect = rect.unionall([x.margin_rect for x in self.children] + [self.rect])
         self.content_rect.topleft = self.rect.topleft
 
     def calc_content_surf(self):
@@ -107,14 +129,18 @@ class ScrollablePanel(Panel):
         for child in self.children:
             child.draw(self.content_surf)
         self.surf.fill((0, 0, 0, 0))
-        self.surf.blit(self.content_surf, -self.offset)
+        self.surf.blit(self.content_surf, -self.lerp_offset)
 
         if self.show_border:
-            pygame.draw.rect(self.surf, self.border_color, (0, 0, self.rect.width, self.rect.height), self.border_width)
+            pygame.draw.rect(self.surf, self.border_color, (0, 0, self.rect.width, self.rect.height), self.border_width, border_radius=self.border_radius_list[0])
 
         surf.blit(self.surf, self.rect)
 
         #UiElement.draw(self, surf)
 
+    def update(self, dt, mouse=None):
+        self._lerp_scroll(dt)
+        super().update(dt, mouse)
+        # print(f"{self.name}: {self.content_surf.size}, r{self.content_rect.size}, sr{self.rect.size}")
 
     

@@ -2,28 +2,30 @@ import pygame
 from src.utils import Pos
 
 joystick_map = {
-        "interact": 0,  # A
+        "interact": 3,  # X
         "dash": 1,      # B
-        "attack": 3,    # X
-        "R1": 7,
-        "L1": 6,
-        "start": 11
+        "attack": 2,    # A
+        "R1": 5,
+        "L1": 4,
+        "start": 9
         }
 
 class JoysMgr:
     def __init__(self, core):
+        self.core = core
         self.joys = {}
-        self.sensitivity_threshold = 0.3  # for joystick sensitivity
+        self.sensitivity_threshold = 0.006  # for joystick sensitivity
 
     def _add_joystick(self, device_index):
         joystick = pygame.joystick.Joystick(device_index)
         self.joys[joystick.get_instance_id()] = {"joy":joystick,
                                                  "move_dir": Pos(0.0, 0.0),
+                                                 "aim_dir": Pos(0.0, 0.0),
                                                  "hat": Pos(0, 0),
-                                                 "interact": False,
-                                                 "hold_interact": False,
-                                                 "interact_up": False,
                                                  "attack": False,
+                                                 "attack_hold": False,
+                                                 "attack_up": False,
+                                                 "interact": False,
                                                  "dash": False,
                                                  "R1": False,
                                                  "L1": False,
@@ -39,14 +41,16 @@ class JoysMgr:
         if event.type == pygame.JOYDEVICEADDED:
             ins_id = self._add_joystick(event.device_index)
             joystick = self.joys[ins_id]['joy']
+            self.core.notifier.notify(f"joystick {ins_id} have been added")
             if joystick.rumble(0, 0.7, 500):
-                print(f"Rumble effect played on joystick {event.instance_id}")
+                print(f"Rumble effect played on joystick {event.device_index}")
 
         if event.type == pygame.JOYDEVICEREMOVED:
             self.remove_joystick(event.instance_id)
 
         if event.type == pygame.JOYBUTTONDOWN:
-            #print(f"\033[91m{event}\033[0m")
+            print(f"\033[91m{event}\033[0m")
+            print(f"\033[91m{event.button}\033[0m")
             if event.button == joystick_map['interact']:
                 self.joys[event.instance_id]['interact'] = True
                 self.joys[event.instance_id]['hold_interact'] = True
@@ -65,6 +69,7 @@ class JoysMgr:
 
             if event.button == joystick_map['L1']:
                 self.joys[event.instance_id]['L1'] = True
+                print("wow")
 
         if event.type == pygame.JOYBUTTONUP:
             #print(f"\033[93m{event}\033[0m")
@@ -78,24 +83,31 @@ class JoysMgr:
                 # direction x 
                 x = event.value
                 self.joys[event.instance_id]['move_dir'][0] = x if abs(x) >= self.sensitivity_threshold else 0.0
-            elif event.axis == 1:
+            if event.axis == 1:
                 # direction y
                 self.joys[event.instance_id]['move_dir'][1] = event.value if abs(event.value) >= self.sensitivity_threshold else 0.0
+
+            if event.axis == 3:
+                self.joys[event.instance_id]['aim_dir'][0] = event.value if abs(event.value) >= self.sensitivity_threshold else 0.0
+
+            if event.axis == 4:
+                self.joys[event.instance_id]['aim_dir'][1] = event.value if abs(event.value) >= self.sensitivity_threshold else 0.0
                 
             
         if event.type == pygame.JOYHATMOTION:
             #print(f"\033[96m{event}\033[0m")
             pos = event.value
             self.joys[event.instance_id]['hat'].x = pos[0]
-            self.joys[event.instance_id]['hat'].y = pos[1]
+            self.joys[event.instance_id]['hat'].y = pos[1] * -1
 
             self.joys[event.instance_id]['move_dir'].x = pos[0]
-            self.joys[event.instance_id]['move_dir'].y = pos[1]
+            self.joys[event.instance_id]['move_dir'].y = pos[1] * -1
 
         
 
-    # should be called at the end of loops like the mouse update method
-    def update(self):
+    # should be called at the end of loops in the input manager or in the state update loop
+    # TODO clean this
+    def clear(self):
        # print(self.joys[0])
         for joy in self.joys.values():
             joy['start'] = False

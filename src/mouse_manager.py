@@ -7,6 +7,8 @@ class MouseManager:
         self.l_down_once = False
         self.l_up_once = False
         self.r_up = False
+        self.r_up_once = False
+        self.r_down_once = False
         self.l_up = True
         self.r_click = False
         self.l_click = False
@@ -33,6 +35,8 @@ class MouseManager:
             elif event.button == 2:  # middle button pressed
                 pass
             elif event.button == 3:  # right button pressed
+                if not self.r_down:
+                    self.r_down_once = True
                 self.r_down = True
                 self.r_up = False
             elif event.button == 4:  # scroll up
@@ -54,6 +58,8 @@ class MouseManager:
                 pass
             elif event.button == 3:  # right button up
                 self.r_down = False
+                if not self.r_up:
+                    self.r_up_once = True
                 self.r_up = True
                 self.r_click = True
         if event.type == pygame.MOUSEMOTION:
@@ -65,6 +71,8 @@ class MouseManager:
     def update(self):
         self.wheel_dir = 0
         self.r_click = False
+        self.r_up_once = False
+        self.r_down_once = False
         self.l_click = False 
         self.l_down_once = False
         self.l_up_once = False

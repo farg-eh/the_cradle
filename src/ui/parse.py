@@ -27,7 +27,7 @@ def get_tag_attributes(tag: str):
         value = value.replace(';', ',') if value.find(';') else value
         attrs[key] = value
 
-    print("blabla"*12)
+    print("~.~."*12)
 
     print(attrs)
 

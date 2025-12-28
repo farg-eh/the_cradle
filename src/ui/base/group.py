@@ -14,6 +14,7 @@ class Group(UiElement):
         self.mouse_stack = []
         self.children = []
         self.named_children = {}
+        self.curr_selected_input_element = None # textfiled for example can attach it self here 
 
     def add_child(self, ui_element):
         self.children.append(ui_element)
@@ -43,12 +44,13 @@ class Group(UiElement):
 
         
     def remove_child(self, ui_element):
-        if ui_element in self.children:
-            self.children.remove(ui_element)
-
+        # if the ui element contains children loop through all of them and kill them
+        if isinstance(ui_element, Group):
+            for element in ui_element:
+                element.die()
         else:
-            print(f"{ui_element.name} doesnt exist in {self.name} children")
-    
+            ui_element.die()
+
     def get_children_by_name(self, name):
         """returns a list of children that have the name if found else returns None"""
         return self.root.named_children.get(name)
@@ -112,6 +114,11 @@ class Group(UiElement):
         m_in = self.mouse_inside
         self.mouse_inside = False
         return m_in
+
+    def handle_keyboard(self, char):
+        if self.curr_selected_input_element != None:
+            self.curr_selected_input_element.on_keyboard_input(char)
+
             
     def draw(self, surf):
         if self.hidden: return
@@ -131,9 +138,21 @@ class Group(UiElement):
         if self.hidden: return
         if self.root == self:
             self.handle_mouse(mouse)
+            if self.curr_selected_input_element and mouse.l_click and self.mouse_stack[-1] != self.curr_selected_input_element:
+                self.curr_selected_input_element.is_selected = False
+                self.curr_selected_input_element._on_select_change()
+                self.curr_selected_input_element = None
+
+        # for debugging
+        #     print(len(self.named_children))
+        # else:
+        #     if self.named_children:
+        #         print(f"\033[m91{len(self.named_children)}\033[0m")
+
 
         for child in self.children:
             child.update(dt, mouse)
+
 
 
     def __iter__(self):

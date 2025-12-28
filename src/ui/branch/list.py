@@ -2,7 +2,7 @@ import pygame
 from abc import ABC, abstractmethod
 
 from .panel import Panel
-from src.utils import Pos, get_abs_pos
+from src.utils import Pos, get_abs_pos, get_rel_pos
 
 
 # abstract class 
@@ -39,6 +39,12 @@ class List(Panel, ABC):
     def remove_child(self, ui_element):
         super().remove_child(ui_element)
         self._last_child_index = len(self.children) - 1
+
+    def clear(self):
+        for kid in self.children:
+            kid.die()
+        #self.children.clear()
+        self._last_child_index = 0
 
     def _grow_rects(self, w_increase, h_increase):
         self.padding_rect.inflate_ip(w_increase, h_increase)
@@ -233,7 +239,7 @@ class VList(List):
     """this VList or Vertical list auto positions elements inside it vertically
     the inital size you specify will expand when needed  
     you can add a max_height to enable wraping 
-    if you specify max_width too it will throw and error if you exceed the list size
+    if you specify max_width too it should throw and error if you exceed the list size
     """
     # this method is used to auto resize the container 
     def _fit_kids(self):
@@ -264,8 +270,9 @@ class VList(List):
 
         #if the element is the first in the column then we position it without thinking much 
         if self._progress_y == 0:
-            child.move_to(get_abs_pos(rect, (self._progress_x, self._progress_y)))
-            self._progress_y += h 
+            child.move_to((self._progress_x + self._padding[0], self._progress_y + self._padding[1]))
+            self._progress_y += h + self._padding[1]
+            self._progress_x += self._padding[0]
             # now we resize if we should
             self._fit_kids()
             # and exit 
@@ -279,8 +286,8 @@ class VList(List):
                 self._progress_y = 0
                 self._progress_x += self._max_w + self.h_gap
                 self._max_w = w
-                # positions the child
-                child.move_to(get_abs_pos(rect, (self._progress_x, self._progress_y)))
+                # positions the childs rect
+                child.move_to((self._progress_x, self._progress_y ))
                 self._progress_y += h
                 # resize our rects 
                 self._fit_kids()
@@ -289,7 +296,7 @@ class VList(List):
 
         # if we have room or if there is no width limit
         self._progress_y += self.v_gap
-        child.move_to(get_abs_pos(rect, (self._progress_x, self._progress_y)))
+        child.move_to((self._progress_x, self._progress_y))
         self._progress_y += h
         # resize our rects if we should
         self._fit_kids()
@@ -303,7 +310,11 @@ class VList(List):
         okay = False
         if okay:
             pygame.draw.rect(surf, 'white', self.padding_rect, 1)
+            pygame.draw.rect(surf, 'gray', self.margin_rect, 1)
             for child in self.children:
                 pygame.draw.rect(surf, 'red', child.margin_rect.move_to(topleft=get_abs_pos(self.rect, child.pos)), 1)
+                pygame.draw.rect(surf, 'pink', child.margin_rect, 1)
+                #print(child.margin_rect)
+
 
 

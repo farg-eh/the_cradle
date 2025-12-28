@@ -4,15 +4,17 @@ from src.settings import FONTS, conf
 
 # TODO: padding is broken here it should be fixed by adding a another surface that is separate from the text surface and place the text surface relativly on the new base surface
 class Text(UiElement):
-    def __init__(self, text='', color='white', font_size='small', wrap_width=0, pos=(0, 0), name='', parent=None, 
+    def __init__(self, text='', color='white', font_size='small', wrap_width=0, pos=(0, 0), name='', parent=None,
                  clickable=False, hoverable=False, scrollable=False, padding=(0, 0), margin=(0, 0),
-                 show_border=False, hidden=False, border_width=1, border_color='white', lang='en', align='left', colorkey=None):
+                 show_border=False, hidden=False, border_width=1, border_color='white', lang='en', align='left', colorkey=None, line_size=0):
         # check if fonts are loaded 
         if not FONTS:
             raise RuntimeError("your trying to create a text element before loading ur fonts from main.py into src/settings.py")
         # setup font 
         self.font: pygame.font.Font = FONTS[font_size+"-"+lang]
         self._align(align)
+        if line_size:
+            self.font.set_linesize(line_size)
 
 
         super().__init__( pos=pos, name=name, parent=parent, 
@@ -28,7 +30,8 @@ class Text(UiElement):
         self.lang = lang
 
 
-        # creating surf and updating rects  
+        # creating surf and updating rects
+        self.wrap_width = int(self.wrap_width)
         self.surf = self.font.render(text, False, color, wraplength=self.wrap_width)
         if colorkey:
             self.surf.set_colorkey(colorkey)
@@ -67,9 +70,16 @@ class Text(UiElement):
         self.text = new_text
         self._update_element_size()
 
+    def get_size(self):
+        return self.rect.size
+
     def draw(self, surf):
+        if self.hidden: return
         super().draw( surf)
-        surf.blit(self.surf, self.margin_rect)
+        surf.blit(self.surf, self.rect.move(*self._margin))
+
+    def get_surf(self):
+        return self.surf
 
 
 class H1(Text):

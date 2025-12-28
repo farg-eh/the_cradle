@@ -12,7 +12,9 @@ class SoundManager:
         self.seq = {}
         self.rand = {}
 
+
     def _set_vol_and_play(self, sound):
+        # NOTE this approach is flexible but its not very optimized ? not really sure however it works fine
         sound.set_volume(self._vol)
         sound.play()
 

@@ -21,6 +21,7 @@ class UiElement:
         # borders 
         self.default_border_color = border_color
         self.border_color = self.default_border_color
+        self.hover_border_color = 'pink'
         self.border_width = border_width
         self.show_border = show_border
 
@@ -35,10 +36,46 @@ class UiElement:
         # status
         self.mouse_inside = False
         self.hidden = hidden
+
+    def die(self):
+        if self.parent:
+            if self in self.parent.children:
+                self.parent.children.remove(self)
+                if self.name in self.parent.root.named_children:
+                    lst: list = self.parent.root.named_children[self.name]
+                    if self in lst:
+                        lst.remove(self)
+                        print(f'removed named element called {self.name}')
+
+            else:
+                print(f"{self.name} doesnt exist in {self.parent.name} children")
+            self.parent = None
+        else:
+            print("\033[91mWarning trying to call a die method on a parentless ui element called {}\033[0m".format(self.__str__()))
+        # clearing the handlers incase they have a reference
+        self.on_click = None
+        self.on_hover = None
+        self.func = None
+        self.on_scroll = None
+
+    # gets the real position  of the rellative (fake) position
+    def get_abs_pos(self, rel_pos):
+        pass
+
+    # gets the fake position of a real (abs) position
+    def get_rel_pos(self, abs_pos):
+        pass
         
     def move_to(self, new_pos):
         self.pos = Pos(*new_pos)
         self.margin_rect.topleft = new_pos
+        self.rect.center = self.margin_rect.center
+        self.padding_rect.center = self.margin_rect.center
+
+    def move_to_by_topright(self, new_pos):
+        # TODO: this is almost the same as the move_to method so find a smarter way to do this 
+        self.pos = Pos(*new_pos)
+        self.margin_rect.topright = new_pos
         self.rect.center = self.margin_rect.center
         self.padding_rect.center = self.margin_rect.center
 
@@ -64,9 +101,9 @@ class UiElement:
         self.padding_rect.center = self.rect.center
 
     def on_hover(self, mouse):
+        if not self.hoverable: return
         if self.mouse_inside:
-            name = self.name if self.name else self.__str__()
-            self.border_color = "pink"
+            self.border_color = self.hover_border_color
         else:
             self.border_color = self.default_border_color
 

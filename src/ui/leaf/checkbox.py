@@ -2,6 +2,7 @@ import pygame
 from src.ui import UiElement
 
 
+# TODO: handle the text attribute or remove it from the miml code in the langauge json
 class CheckBox(UiElement):
     def __init__(self, pos=(0, 0), size=(15, 15), name="", text="", color='white', margin=(0, 0), padding=(0, 0)):
         super().__init__(pos, size, clickable=True, name=name, margin=margin, padding=padding)

@@ -4,7 +4,7 @@ import sys
 from src.states.state import State
 from src.utils import import_img, import_imgs, Animation, Timer, Pos, Rect, TextLoader
 from src.ui import Stretchable
-from src.ui import TextBox, CheckBox
+from src.ui import TextBox, CheckBox, PopPanel, Button, Text, HList, TextField
 from .page import Page, PageCheckBox, PageSlider, book_classes
 from .tags import Tags
 from src.ui.parse import mimlize
@@ -71,7 +71,7 @@ class BookBG:
         max_page_index = len(self.pages[self.curr_tag]) - 1
         lp = self.lp_index if self.lp_index < max_page_index else -1
         rp = self.rp_index if self.rp_index <= max_page_index else -1
-        print(f'lp is {lp}, and rp is {rp}')
+        # print(f'lp is {lp}, and rp is {rp}')
         self.l_page = self.pages[self.curr_tag][lp] if lp >= 0 else self.empty_l_page
         self.r_page = self.pages[self.curr_tag][rp] if rp >=0 else self.empty_r_page
 
@@ -136,7 +136,7 @@ class BookBG:
         self.rp_index = self.lp_index + 1
         lp = self.lp_index if self.lp_index < max_page_index else -1
         rp = self.rp_index if self.rp_index <= max_page_index else -1
-        print(f'lp is {lp}, and rp is {rp}')
+        # print(f'lp is {lp}, and rp is {rp}')
 
         # applying the changes
         self.l_page = self.pages[self.curr_tag][lp] if lp >= 0 else self.empty_l_page
@@ -146,7 +146,7 @@ class BookBG:
         # showing the new pages 
         self.l_page.fade_in()
         self.r_page.fade_in()
-        print(len(self.menu.root.children))
+        # print(len(self.menu.root.children))
         # paly a random sound
         #sn = random.choice(self.menu.assets['sounds']['pf'])
         #sn.play()
@@ -238,7 +238,7 @@ class BookBG:
         if self.settings_prepared : return
 
         ui = self.menu.root.named_children
-        print(ui)
+        # print(ui)
         fullscreen_cbox = ui.get('fullscreen_cbox')[0]
         fullscreen_cbox.value = self.menu.core._fullscreen
         fullscreen_cbox.func = self._switch_fullscreen
@@ -279,7 +279,8 @@ class BookBG:
     def editor_tag_click(self):
         print('\033[93meditor tag pulled\033[0m')
         self.change_section_pages('editor')
-        self.menu.switch_state('editor')
+        #self.menu.switch_state('editor')
+        self._editor_map_name_popup()
 
     def multiplare_tag_click(self):
         print('\033[93mmultiplayer tag pulled\033[0m')
@@ -294,7 +295,43 @@ class BookBG:
         print('\033[93mabout tag pulled\033[0m')
         self.change_section_pages('about')
 
+    def _editor_map_name_popup(self):
+        # create pop panel and its content
+        pop_panel, panel, vlist = PopPanel.with_empty_panel(size=(220, 130))
+        vlist.v_gap = 10
+        centerx = vlist.padding_rect.width / 2
 
+        title = Text("Choose Map to Edit", color="#dd936e", font_size="big")
+        vlist.add_child(title)
+
+        map_name_tf = TextField(text="testmap", width=100, color="#b96d4a", placeholder="map_name",
+                                  text_color="#eec39a", selected_color="#bb3736")
+        map_name_tf.bg_color = "#de946e"
+        map_name_tf.func = lambda: print(f"{map_name_tf.value}")
+        map_name_label = Text("map name : ", font_size="mid", color="#dd936e")
+        map_name_row = HList()
+        map_name_row.add_child(map_name_label)
+        map_name_row.add_child(map_name_tf)
+        vlist.add_child(map_name_row)
+
+        btn_kwargs = {'size': (140, 25), 'border_color': '#b96d4a', 'back_color': "black", 'fore_color': "#b96d4a"}
+        open_btn = Button(text="Open", func=lambda: print(f"\033[91mokay\033[0m"), **btn_kwargs)
+
+        vlist.add_child(open_btn)
+
+        # center children
+        for child in vlist.children:
+            child.move_to_by_center((centerx, child.rect.centery + 35))
+
+        # open button function
+        def func(mouse=None):
+            if map_name_tf.value:
+                map_to_open_name = map_name_tf.value
+                self.menu.switch_state('editor', map_to_open=map_to_open_name)
+            else:
+                self.menu.core.notifier.notify("cannot open empty map name")
+        open_btn.func = func
+        self.menu.root.add_child(pop_panel)
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~ throw away functions for settings ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def _switch_fullscreen(self, value):
@@ -319,8 +356,8 @@ class BookBG:
 
         self.menu.core._music_vol = value
         pygame.mixer.music.set_volume(value)
-        print(value)
-        print(pygame.mixer.music.get_volume())
+        # print(value)
+        # print(pygame.mixer.music.get_volume())
         
     def _sfx_vol_func(self, value, mouse=None):
         if value == self.menu.core._sfx_vol: return
@@ -328,8 +365,8 @@ class BookBG:
 
         self.menu.core._sfx_vol = value
         self.menu.sound_mgr._vol = value
-        print(value)
-        print(self.menu.sound_mgr._vol)
+        # print(value)
+        # print(self.menu.sound_mgr._vol)
 
         # play sound
         if value > old_vol:

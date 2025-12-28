@@ -1,5 +1,5 @@
 import pygame
-import sys, os, psutil
+import sys, os
 from src.settings import SW, SH, FRAMERATE, DEBUG, FONTS
 from src.ui.custom.notify import NotificationManager
 from src.utils import Timer, import_font
@@ -11,8 +11,15 @@ from src.utils.lerp import oscilating_lerp
 from src.settings import conf
 from src.joystick import JoysMgr
 
-# this class share global info between all other game states and is responsible
-# for state swtiching 
+PSUTIL = False
+try:
+    #import psutil
+    PSUTIL = False
+except:
+    pass
+
+# this class shares global info between all other game states and currently is responsible
+# for holding global settings(like sound and screen state(full, scaled)), state swtiching, system perofrmance monitoring, notification handeling, font loading ..
 class Core:
     def __init__(self):
         # start pygame 
@@ -26,7 +33,7 @@ class Core:
         self.screen = None
         self._fullscreen = False
         self._scaled = True
-        self._show_fps = False
+        self._show_fps = True
         self.update_screen()
         self.display = pygame.Surface((SW//2, SH//2), pygame.SRCALPHA)
         # swich state effect
@@ -55,7 +62,7 @@ class Core:
                      }
 
         # stuff for measuring game performance info
-        self.process = psutil.Process(os.getpid())
+        self.process = psutil.Process(os.getpid()) if PSUTIL else None # noqa
         self.fps_avg = 0
         self.avg_timer = Timer(500, False, True)
         self.frames = [] # for measuring fps average every 500ms
@@ -76,12 +83,15 @@ class Core:
 
         # notifications manager
         self.notifier = NotificationManager()
-        
 
-
-        # delete
-        self.meme_msgs = ["i", "love", "you\n meme sOOOoOOOOooooo much !!!", "<3 "*17, 'love you '*9, "hehe", "hugs", ":)", "mwah"*40 ] 
-        self.ind = 0
+        # implementing fixed timestep gameloop for a fixed updates loop
+        self.tps = 14   # ticks per second ( fixed updates rate )
+        self.tick_len = 1000 / self.tps  # length of the tick in ms
+        self.nxt_tick = pygame.time.get_ticks()
+        # max loops is how many times the fixed update loops can re run itself to catch up
+        self.max_loops = 5   # means it will be consistant unless u go below a very low number of fps
+        self.tick_dt = self.tick_len/1000  # when u multiplay a value by this it means that this value will be reached after 1 sec
+        self.tick_prog = 0 # value from 0 to 1 represent how far are we from the next tick
 
     def load_fonts(self):
         path = 'assets/fonts/regular.ttf'
@@ -100,9 +110,6 @@ class Core:
             font.set_script("Arab")
             font.set_direction(pygame.DIRECTION_RTL)
             #font.align = pygame.FONT_RIGHT
-
-
-
 
     def prepare_debug_panel(self, debug_panel):
         fullscreen_cbox = debug_panel.get_child_by_name('fullscreen')
@@ -133,22 +140,22 @@ class Core:
         else:
             self.screen = pygame.display.set_mode((SW, SH))
 
-    def _switch_state(self, new_state):
+    def _switch_state(self, new_state, **kwargs):
         pygame.mixer.music.unload()
-        match new_state:
-            case 'menu':
-                self.current_state = Menu(self)
-            case 'game':
-                self.current_state = Game(self)
-            case 'editor':
-                self.current_state = Editor(self)
-            case 'testyard':
-                self.current_state = TestYard(self)
-            case _:
-                raise ValueError(f"you tried to switch to an unknow game state : {new_state}")
 
-    def switch_state(self, new_state):
-        self.effect_timer_func = lambda: self._switch_state(new_state)
+        if new_state == 'menu':
+            self.current_state = Menu(self)
+        elif new_state == 'game':
+            self.current_state = Game(self)
+        elif new_state == 'editor':
+            self.current_state = Editor(self, **kwargs)
+        elif new_state == 'testyard':
+            self.current_state = TestYard(self)
+        else:
+            raise ValueError(f"you tried to switch to an unknown game state: {new_state}")
+
+    def switch_state(self, new_state, **kwargs):
+        self.effect_timer_func = lambda: self._switch_state(new_state, **kwargs)
         self.effect_timer.activate()
 
     def run(self):
@@ -178,9 +185,7 @@ class Core:
 
                     if event.key == pygame.K_0: # force grabage collection
                         gc.collect()
-                        self.notifier.notify(self.meme_msgs[self.ind])
-                        self.ind +=1
-                        self.ind %= len(self.meme_msgs)
+                        self.notifier.notify("garbage collector forced to collect")
 
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_LCTRL or event.key == pygame.K_RCTRL:
@@ -195,7 +200,6 @@ class Core:
 
             # update
             self.debug_panel.update(self.dt, self.current_state.mouse)
-
             self.current_state.update(self.dt)
             
             self.effect_timer.update()
@@ -203,11 +207,21 @@ class Core:
                 self.effect_timer_func()
                 self.effect_timer_func = None
 
-            self.joy_mgr.update()
 
             #self.nc.update(self.dt, self.current_state.mouse)
             self.notifier.update(self.dt, self.current_state.mouse)
 
+            # fixed updates
+            loops = 0
+            curr_time = pygame.time.get_ticks()
+            while curr_time >= self.nxt_tick and loops<self.max_loops:
+                self.nxt_tick += self.tick_len
+                loops += 1
+                self.current_state.fixed_update(self.tick_dt)
+
+            # time factor between previous tick and curr tick useful for interpolation range 0 to 1
+            self.tick_prog = (curr_time - (self.nxt_tick - self.tick_len)) / self.tick_len
+            self.tick_prog = max(0.0, min(1.0, self.tick_prog))
 
             
             # draw
@@ -232,24 +246,24 @@ class Core:
             # cpu & fps
             fps = self.clock.get_fps()
             self.frames.append(fps)
-            if DEBUG:
+            if DEBUG and PSUTIL:
                 self.cpu_usages.append(psutil.cpu_percent())
             self.avg_timer.update()
             if self.avg_timer.done:
                 self.PERFORMANCE_INFO['fps_avg'] = str(int(sum(self.frames)/len(self.frames)))
                 self.frames.clear()
                 if DEBUG:
-                    self.PERFORMANCE_INFO['system_cpu_usage'] = f"{(sum(self.cpu_usages)/len(self.cpu_usages)):.1f} %"
+                    self.PERFORMANCE_INFO['system_cpu_usage'] = f"{(sum(self.cpu_usages)/len(self.cpu_usages)):.1f} %" if PSUTIL else "psutil not imported"
                     self.cpu_usages.clear()
                 self.avg_timer.activate()
             self.PERFORMANCE_INFO['fps'] = str(int(fps))
             if DEBUG:
                 # ram
-                self.PERFORMANCE_INFO['ram_usage'] = f"{self.process.memory_info().rss / (1024 * 1024):.2f} MB"
-                self.PERFORMANCE_INFO['system_available_ram'] = f"{psutil.virtual_memory().available // (1024 * 1024)} MB" 
+                self.PERFORMANCE_INFO['ram_usage'] = f"{self.process.memory_info().rss / (1024 * 1024):.2f} MB" if PSUTIL else "psutil not imported"
+                self.PERFORMANCE_INFO['system_available_ram'] = f"{psutil.virtual_memory().available // (1024 * 1024)} MB" if PSUTIL else 'psutil not imported'
 
                 # disk
-                self.PERFORMANCE_INFO['system_disk_usage'] = f"{psutil.disk_usage('/')[3]}%"
+                self.PERFORMANCE_INFO['system_disk_usage'] = f"{psutil.disk_usage('/')[3]}%" if PSUTIL else "psutil not imported"
                 #print("\033[95m" + "~"*22 + "\033[0m")
                 #for key, item in self.PERFORMANCE_INFO.items():
                     #print(f"{key} -> \033[93m{item}\033[0m")
@@ -272,6 +286,8 @@ class Core:
                 else:
                     m_path_txt.change_text(" > ".join([kid.name if kid.name else str(kid) for kid in self.current_state.root.mouse_stack]))
 
+
+            #self.joy_mgr.update()
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ throw away methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def switch_fullscreen(self, value):
         self._fullscreen = value
@@ -283,7 +299,6 @@ class Core:
 
     def change_dpanel_opacity(self, value, mouse=None):
         self.debug_panel.set_opacity(value)
-
 
                 
 if __name__ == '__main__':

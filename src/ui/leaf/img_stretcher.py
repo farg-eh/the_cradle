@@ -58,7 +58,7 @@ class SurfStretcher:
 
     def draw(self, surf):
         if not self.stretchables: return
-        print(self.stretchables)
+        # print(self.stretchables)
         for _, s in self.stretchables.items():
             surf.blit(s['stretching_surf'], s['stretching_rect'])
             surf.blit(s['moving_surf'], s['moving_rect'])
