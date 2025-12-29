@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import random
 import pygame.transform
-from asynckivy import animate
+
 
 from src.utils import import_img, import_imgs, import_sound, import_imgs_as_dict, Animation, Pos, Rect, Timer, StopWatch
 from src.ui import Text
